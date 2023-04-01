@@ -61,7 +61,7 @@ def t_FPYTHON_FECHAFP(t):
     return t
 
 def t_FPYTHON_FUNABRE(t):
-    r'deff\s+([\w-]+)\('
+    r'deff\s+([\w-]+)\s*\('
     t.lexer.begin('FUNCAO')
     print('Nome funcão: ' + re.search('deff\s+(\w+)',t.value).group(1))
     return t
@@ -72,8 +72,8 @@ def t_FUNCAO_VAR(t):
     return t
 
 def t_FUNCAO_NUMBER(t):
-    r'\d+'
-    print('Argumento número ' + re.search('\d+',t.value).group())
+    r'(\+|\-)?\d+(\.d+)?'
+    print('Argumento número ' + re.search('((\+|\-)?\d+(\.d+)?)',t.value).group())
     return t
 
 def t_FUNCAO_LIST(t):
@@ -111,7 +111,7 @@ def t_CORPOFUN_IF(t):
     return t
 
 def t_COND_NUMBER(t):
-    r'\d+'
+    r'(\+|\-)?\d+(\.d+)?'
     print('cond number')
     return t
 
@@ -228,6 +228,18 @@ end
 
 deff sum([]):
     return 0
+end
+
+deff div(n,0):
+    return 0
+end
+
+deff div(0,n):
+    return 0
+end
+
+deff div(n,-1):
+    return n*-1
 end
 
 deff sum([h | t]):
