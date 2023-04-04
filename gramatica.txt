@@ -1,0 +1,62 @@
+# FPYTHON pode ser escrito com minusculas ou maiusculas
+S -> '"""FPYTHON' FPYTHON '"""'
+
+FPYTHON -> 'deff ' NOMEFUN '(' ARGSFUN ')' CORPOFUN
+         | 'deff ' NOMEFUN '()' CORPOFUN
+
+NOMEFUN -> [A-Za-z]\w+
+
+ARGSFUN -> VAR
+         | VAR , ARGS
+
+CORPOFUN -> 'return ' RETURNFUN 'end'
+          | 'if' COND 'then' CORPOFUN 'else' CORPOFUN 'end'
+
+COND -> VAROPER CONDS VAROPER
+      | 'not' COND
+      | COND 'and' COND
+      | COND 'or' COND
+      | '('COND')'
+
+CONDS -> '<'
+       | '>'
+       | '<='
+       | '>='
+       | '=='
+       | '!='
+       | 'in'
+
+RETURNFUN -> VAROPER
+           | OPERN VAROPER
+           | RETURNFUN OPER RETURNFUN
+           | '(' RETURNFUN ')'
+
+OPERN -> '+'
+       | '-'
+
+OPER -> OPERN
+      | '*'
+      | '/'
+      | '%'
+      | '&'
+      | '|'
+      | CONDS
+
+VAROPER -> VAR
+         |  NOMEFUN '(' ARGSFUN ')'
+         |  NOMEFUN '()'
+
+VAR -> NUMBER
+     | BOOL
+     | LIST
+     | [A-Za-z]\w+
+
+NUMBER -> num 
+        | num '.' num
+
+BOOL -> 'true'
+      | 'false'
+
+LIST -> '[' ']'
+      | '[' ARGSFUN ']'
+      | '[' [A-Za-z]\w+ | [A-Za-z]\w+ ']'
