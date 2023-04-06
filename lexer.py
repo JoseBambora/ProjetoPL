@@ -329,6 +329,46 @@ def t_error(t):
 lexer = lex()
 lexer.stack = []
 
+inp2 = '''
+"""FPYTHON
+deff pertence([],_)
+    return false
+end
+
+deff pertence([h|t],num)
+    if (h == num) then 
+        return true end
+    else 
+        return pertence(t,num) end
+end
+
+deff append([],num)
+    return [num]
+end
+
+deff append([h|t],num)
+    return [h|append(t,num)]
+end
+
+deff adiciona(l,num)
+    if (not pertence(l,num)) then
+        return append(l,num) end
+    else
+        return l end
+end
+
+deff eliminarepetidos([])
+    return []
+end
+deff eliminarepetidos([h|t])
+    return adiciona(eliminarepetidos(t),h)
+end
+"""
+
+lista = [1,2,3,4,5,6,3,4,51,243,13,53,32]
+soma = f_eliminarepetidos_(lista)
+print(soma)'''
+
 inp = '''
 
 """FPYTHON
@@ -402,7 +442,7 @@ l = [1,2,3,4,5]
 sum_l = f_sum_(l)
 print(sum_l)
 '''
-lexer.input(inp)
+lexer.input(inp2)
 t = lexer.token()
 while(t):
     t = lexer.token()
