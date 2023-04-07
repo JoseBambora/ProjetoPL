@@ -1,8 +1,6 @@
 from ply.lex import lex
 import re
 
-# n + (-1)
-
 tokens = (
     'ADD',          # +
     'MINUS',        # -
@@ -36,7 +34,9 @@ tokens = (
     'NOT',          # not
     'CONDAND',      # and
     'CONDOR',       # or
-    'RETURN'        # return
+    'RETURN',       # return
+    'ABREL',        # [
+    'FECHAL'        # ]
 )
 
 states = (
@@ -46,7 +46,8 @@ states = (
     ('IFTHENELSE','inclusive'),
     ('COND','inclusive'),
     ('INVOCACAOFUN','inclusive'),
-    ('RETURNFUN','inclusive')
+    ('RETURNFUN','inclusive'),
+    ('LISTSTATE','inclusive')
 )
 
 t_VIR = r','
@@ -123,8 +124,15 @@ def t_ARGSFUN_NUMBER(t):
     return t
 
 def t_ARGSFUN_VAR(t):
-    r'(\w+|\[\w+\s*\|\s*\w+\s*\])'
-    print('Argumento ' + re.search('(\w+|\[\w+\s*\|\s*\w+\s*\])',t.value).group())
+    r'\w+'
+    print('Argumento ' + re.search('\w+',t.value).group())
+    return t
+
+def t_ARGSFUN_ABREL(t):
+    r'\['
+    t.lexer.begin('LISTSTATE')
+    t.lexer.stack.append('ARGSFUN')
+    print('Argumento Lista')
     return t
 
 def t_ARGSFUN_LIST(t):
@@ -216,7 +224,7 @@ def t_COND_BOOL(t):
     print('bool cond')
     return t
 
-def t_COND_LISTA(t):
+def t_COND_LIST(t):
     r'(\[\s*\]|\[\s*((\w+|\d+)\s*,\s*)*(\w+|\d+)\s*\])'
     print('condicao lista')
     return t
@@ -229,8 +237,8 @@ def t_COND_CHAMADAFUN(t):
     return t
 
 def t_COND_VAR(t):
-    r'(\w+|\[\w+\s*\|\s*\w+\s*\])'
-    print('Condicao variável ' + re.match(r'(\w+|\[\w+\s*\|\s*\w+\s*\])',t.value).group(1))
+    r'\w+'
+    print('Condicao variável ' + re.match(r'(\w+)',t.value).group(1))
     return t
 
 def t_COND_FECHAP(t):
@@ -243,6 +251,12 @@ def t_COND_FECHAP(t):
 def t_COND_ABREP(t):
     r'\('
     print('Condição aninhada')
+    t.lexer.stack.append('COND')
+    return t
+
+def t_COND_ABREL(t):
+    r'\['
+    t.lexer.begin('LISTSTATE')
     t.lexer.stack.append('COND')
     return t
 
@@ -276,7 +290,13 @@ def t_INVOCACAOFUN_CHAMADAFUN(t):
     return t
 
 def t_INVOCACAOFUN_VAR(t):
-    r'(\w+|\[\w+\s*\|\s*\w+\s*\])'
+    r'\w+'
+    return t
+
+def t_INVOCACAOFUN_ABREL(t):
+    r'\['
+    t.lexer.begin('LISTSTATE')
+    t.lexer.stack.append('INVOCACAOFUN')
     return t
 
 def t_INVOCACAOFUN_FECHAP(t):
@@ -317,9 +337,45 @@ def t_RETURNFUN_LIST(t):
     print('Retorno lista ' + re.search('(\[\s*\]|\[\s*((\w+|\d+)\s*,\s*)*(\w+|\d+)\s*\])',t.value).group())
     return t
 
+def t_RETURNFUN_ABREL(t):
+    r'\['
+    print('Return Lista')
+    t.lexer.begin('LISTSTATE')
+    t.lexer.stack.append('RETURNFUN')
+    return t
+
 def t_RETURNFUN_VAR(t):
-    r'(\w+|\[\w+\s*\|\s*\w+\s*\])'
-    print('Retorno var ' + re.search('(\w+|\[\w+\s*\|\s*\w+\s*\])',t.value).group())
+    r'\w+'
+    print('Retorno var ' + re.search('\w+',t.value).group())
+    return t
+
+def t_LISTSTATE_FECHAL(t):
+    r'\]'
+    pop = t.lexer.stack.pop(-1)
+    t.lexer.begin(pop)
+    return t
+
+def t_LISTSTATE_CHAMADAFUN(t):
+    r'\w+\('
+    print('Chamada função lista ' + re.match('(\w+)',t.value).group(1))
+    t.lexer.begin('INVOCACAOFUN')
+    t.lexer.stack.append('LISTSTATE')
+    return t
+
+def t_LISTSTATE_VAR(t):
+    r'\w+'
+    print('Var lista')
+    return t
+
+def t_LISTSTATE_OR(t):
+    r'\|'
+    print('+1 elemento')
+    return t
+
+def t_LISTSTATE_ABREL(t):
+    r'\['
+    print('Lista de Lista')
+    t.lexer.stack.append('LISTSTATE')
     return t
 
 def t_error(t):
@@ -367,7 +423,8 @@ end
 
 lista = [1,2,3,4,5,6,3,4,51,243,13,53,32]
 soma = f_eliminarepetidos_(lista)
-print(soma)'''
+print(soma)
+'''
 
 inp = '''
 
