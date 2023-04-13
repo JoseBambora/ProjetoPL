@@ -163,8 +163,6 @@ def t_CORPOFUN_IF(t):
     r'if\s*\('
     print('Inicializa if')
     t.lexer.begin('COND')
-    # t.lexer.stack.append('IFTHENELSE')
-    # print(f'Stack atual: {t.lexer.stack}')
     return t
 
 def t_COND_RETURNFUN_MENOR(t):
@@ -247,10 +245,8 @@ def t_COND_VAR(t):
 
 def t_COND_FECHAP(t):
     r'\)'
-    # state = t.lexer.stack.pop(-1)
     t.lexer.begin('IFTHENELSE')
-    # print('Fecha Condição. Estado: ' + state)
-    # print(f'Stack atual: {t.lexer.stack}')
+    print('Acaba condição')
     return t
 
 def t_COND_ABREP(t):
