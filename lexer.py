@@ -128,16 +128,17 @@ def t_ARGSFUN_VAR(t):
     print('Argumento ' + re.search('\w+',t.value).group())
     return t
 
+def t_ARGSFUN_LIST(t):
+    r'(\[\s*\]|\[\s*((\w+|\d+)\s*,\s*)*(\w+|\d+)\s*\])'
+    print('Argumento lista ' + re.search('(\[\s*\]|\[\s*((\w+|\d+)\s*,\s*)*(\w+|\d+)\s*\])',t.value).group())
+    return t
+
 def t_ARGSFUN_ABREL(t):
     r'\['
     t.lexer.begin('LISTSTATE')
     t.lexer.stack.append('ARGSFUN')
+    print(f'Stack atual: {t.lexer.stack}')
     print('Argumento Lista')
-    return t
-
-def t_ARGSFUN_LIST(t):
-    r'(\[\s*\]|\[\s*((\w+|\d+)\s*,\s*)*(\w+|\d+)\s*\])'
-    print('Argumento lista ' + re.search('(\[\s*\]|\[\s*((\w+|\d+)\s*,\s*)*(\w+|\d+)\s*\])',t.value).group())
     return t
 
 def t_ARGSFUN_FECHAP(t):
@@ -152,6 +153,7 @@ def t_RETURNFUN_FUNFECHA(t):
     if len(t.lexer.stack) > 0:
         state = t.lexer.stack.pop()
     print('fecha funcão ' + state)
+    print(f'Stack atual: {t.lexer.stack}')
     if state == 'FPYTHON':
         print('========================')
     t.lexer.begin(state)
@@ -161,7 +163,8 @@ def t_CORPOFUN_IF(t):
     r'if\s*\('
     print('Inicializa if')
     t.lexer.begin('COND')
-    t.lexer.stack.append('IFTHENELSE')
+    # t.lexer.stack.append('IFTHENELSE')
+    # print(f'Stack atual: {t.lexer.stack}')
     return t
 
 def t_COND_RETURNFUN_MENOR(t):
@@ -234,6 +237,7 @@ def t_COND_CHAMADAFUN(t):
     print('Chamada função ' + re.match('(\w+)',t.value).group(1))
     t.lexer.begin('INVOCACAOFUN')
     t.lexer.stack.append('COND')
+    print(f'Stack atual: {t.lexer.stack}')
     return t
 
 def t_COND_VAR(t):
@@ -243,27 +247,31 @@ def t_COND_VAR(t):
 
 def t_COND_FECHAP(t):
     r'\)'
-    state = t.lexer.stack.pop(-1)
-    t.lexer.begin(state)
-    print('Fecha Condição. Estado: ' + state)
+    # state = t.lexer.stack.pop(-1)
+    t.lexer.begin('IFTHENELSE')
+    # print('Fecha Condição. Estado: ' + state)
+    # print(f'Stack atual: {t.lexer.stack}')
     return t
 
 def t_COND_ABREP(t):
     r'\('
     print('Condição aninhada')
     t.lexer.stack.append('COND')
+    print(f'Stack atual: {t.lexer.stack}')
     return t
 
 def t_COND_ABREL(t):
     r'\['
     t.lexer.begin('LISTSTATE')
     t.lexer.stack.append('COND')
+    print(f'Stack atual: {t.lexer.stack}')
     return t
 
 def t_IFTHENELSE_THEN(t):
     r'then'
     print('then')
     t.lexer.stack.append('IFTHENELSE')
+    print(f'Stack atual: {t.lexer.stack}')
     t.lexer.begin('CORPOFUN')
     return t
 
@@ -281,28 +289,40 @@ def t_CORPOFUN_RETURN(t):
 
 def t_INVOCACAOFUN_NUMBER(t):
     r'\d+(\.d+)?'
+    print('Invocacação fun número')
     return t
 
 def t_INVOCACAOFUN_CHAMADAFUN(t):
     r'\w+\('
     print('Chamada função ' + re.match('(\w+)',t.value).group(1))
     t.lexer.stack.append('INVOCACAOFUN')
+    print(f'Stack atual: {t.lexer.stack}')
     return t
 
 def t_INVOCACAOFUN_VAR(t):
     r'\w+'
+    print('Invocacação fun variavel')
     return t
 
 def t_INVOCACAOFUN_ABREL(t):
     r'\['
+    print('Invocacação fun Lista')
     t.lexer.begin('LISTSTATE')
     t.lexer.stack.append('INVOCACAOFUN')
+    print(f'Stack atual: {t.lexer.stack}')
     return t
 
 def t_INVOCACAOFUN_FECHAP(t):
     r'\)'
     pop = t.lexer.stack.pop(-1)
     t.lexer.begin(pop)
+    print(f'Stack atual: {t.lexer.stack}')
+    return t
+
+def t_INVOCACAOFUN_ABREP(t):
+    r'\('
+    t.lexer.stack.append('INVOCACAOFUN')
+    print(f'Stack atual: {t.lexer.stack}')
     return t
 
 def t_RETURNFUN_CHAMADAFUN(t):
@@ -310,6 +330,7 @@ def t_RETURNFUN_CHAMADAFUN(t):
     print('Retorno chamada função ' + re.match('(\w+)',t.value).group(1))
     t.lexer.begin('INVOCACAOFUN')
     t.lexer.stack.append('RETURNFUN')
+    print(f'Stack atual: {t.lexer.stack}')
     return t
 
 def t_RETURNFUN_ABREP(t):
@@ -342,6 +363,7 @@ def t_RETURNFUN_ABREL(t):
     print('Return Lista')
     t.lexer.begin('LISTSTATE')
     t.lexer.stack.append('RETURNFUN')
+    print(f'Stack atual: {t.lexer.stack}')
     return t
 
 def t_RETURNFUN_VAR(t):
@@ -353,6 +375,7 @@ def t_LISTSTATE_FECHAL(t):
     r'\]'
     pop = t.lexer.stack.pop(-1)
     t.lexer.begin(pop)
+    print(f'Stack atual: {t.lexer.stack}')
     return t
 
 def t_LISTSTATE_CHAMADAFUN(t):
@@ -360,6 +383,7 @@ def t_LISTSTATE_CHAMADAFUN(t):
     print('Chamada função lista ' + re.match('(\w+)',t.value).group(1))
     t.lexer.begin('INVOCACAOFUN')
     t.lexer.stack.append('LISTSTATE')
+    print(f'Stack atual: {t.lexer.stack}')
     return t
 
 def t_LISTSTATE_VAR(t):
@@ -376,6 +400,7 @@ def t_LISTSTATE_ABREL(t):
     r'\['
     print('Lista de Lista')
     t.lexer.stack.append('LISTSTATE')
+    print(f'Stack atual: {t.lexer.stack}')
     return t
 
 def t_error(t):
@@ -469,11 +494,20 @@ end
 deff con2([h|t],n)
     if (n == h) then
         if (not con2(t,n)) then
-            return true end
+            if(true) then
+                return true end
+            else
+                return false end
         else
             return false end
-    else
-        return false end
+    else 
+        if (con2(t,n)) then
+            if(true) then
+                return true end
+            else
+                return false end
+        else
+            return false end
 end
 
 deff seila([1,2],0,true)
@@ -490,6 +524,9 @@ deff seila([h|t],num,true)
 
 deff seila([h|t],num,false)
     return h + seila3(seila(t)) + num end
+
+deff seila3(d)
+    return seila4(5+(3*d)) end
 """
 
 x = 4
@@ -499,7 +536,7 @@ l = [1,2,3,4,5]
 sum_l = f_sum_(l)
 print(sum_l)
 '''
-lexer.input(inp2)
+lexer.input(inp)
 t = lexer.token()
 while(t):
     t = lexer.token()
