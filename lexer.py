@@ -213,7 +213,7 @@ def t_NUMBER(t):
     return t
 
 def t_WORD(t):
-    r'\w+'
+    r'[A-Za-z]\w+'
     print(f'Palavra {t.value}',end=' ')
     return t
 
