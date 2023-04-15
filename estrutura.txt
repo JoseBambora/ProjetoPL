@@ -1,0 +1,112 @@
+abstract syntax tree
+
+deff seila(x,b)
+    if (b) return x*-1;
+    else return x;
+end
+
+deff add([],num):
+    return [num];
+end
+
+deff add([h:t],num):
+    return [h:add(t,num)];
+end
+
+
+deff seila2(x,b,b1)
+    if (b) 
+        if (b1) return x*-1;
+        else return x*-2;
+    else  
+        if (b1) return x;
+        else return x*2;
+end
+
+deff sum(x,y)
+    return x+y;
+end
+
+deff sum(x,0)
+    return x;
+end
+
+deff minus(x,y)
+    return x-y;
+end
+
+[
+    {
+        'nome':'sum',
+        'implementacoes':[
+            {
+                'args': [x,y]
+                'resultado': [x,+,y]
+            },
+            {
+                'args': [x,0]
+                'resultado': [x]
+            }
+        ]
+    },
+    {
+        'nome':'minus'
+        'implementacoes':[
+            {
+                'args': [x,y]
+                'resultado': [x,-,y]
+            }
+        ]
+    },
+    {
+        'nome':'seila'
+        'implementacoes':[
+            {
+                'args': [x,b]
+                'condicoes': [b]
+                'resultado': [
+                    [x,*,-,1],
+                    [x]
+                ]
+            }
+        ]
+    },
+    {
+        'nome':'seila2'
+        'implementacoes':[
+            {
+                'args': [x,b,b1]
+                'condicoes': [
+                    # ([cond],[then],[else])
+                    # then ou else é número => número = indice do resultado
+                    ([b],[(b1,[0],[1])],[([b1],[2],[3])])
+                ]
+                'resultado': [
+                    [x,*,-,1],
+                    [x,*,-,2],
+                    [x],
+                    [x,*,2]
+                ]
+            }
+        ]
+    },
+    {
+        'nome':'add'
+        'implementacoes':[
+            {
+                'args': ['[',']',num]
+                'condicoes': []
+                'resultado': [
+                    ['[',num,']']
+                ]
+            },
+            {
+                'args': ['[',h,':',t,']',num]
+                'condicoes': []
+                'resultado': [
+                    ['[',h,':',add,'(',t,num,')',']']
+                ]
+            }
+        ]
+    }
+]

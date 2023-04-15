@@ -1,62 +1,65 @@
+# Recursividade à esquerda
+# https://colab.research.google.com/drive/1hIJRrptAaHux_P-ArtNy-XKpdmxWdzdD
+# https://ply.readthedocs.io/en/latest/ply.html#yacc
+# prioridades * / sobre + - usar precedence
 # FPYTHON pode ser escrito com minusculas ou maiusculas
-S -> '"""FPYTHON' FPYTHON '"""'
 
-FPYTHON -> 'deff ' NOMEFUN '(' ARGSFUN ')' CORPOFUN
-         | 'deff ' NOMEFUN '()' CORPOFUN
+S -> ABREFP Fpython FECHAFP
 
-NOMEFUN -> [A-Za-z]\w+
+Fpython -> Fpython FUNCAO
+         | FUNCAO
 
-ARGSFUN -> VAR
-         | VAR , ARGS
+Funcao -> FUNABRE WORD ABREP Conjunto FECHAP Corpofun FUNFECHA
+        | FUNABRE WORD ABREP FECHAP Corpofun FUNFECHA
 
-CORPOFUN -> 'return ' RETURNFUN 'end'
-          | 'if' COND 'then' CORPOFUN 'else' CORPOFUN 'end'
+Conjunto -> Var
+         | Conjunto VIR Var
 
-COND -> VAROPER CONDS VAROPER
-      | 'not' COND
-      | COND 'and' COND
-      | COND 'or' COND
-      | '('COND')'
+Corpofun -> RETURN Result PV 
+          | IF ABREP Cond FECHAP Corpofun ELSE Corpofun
 
-CONDS -> '<'
-       | '>'
-       | '<='
-       | '>='
-       | '=='
-       | '!='
-       | 'in'
+Cond -> Varoper Conds Varoper
+      | NOT Cond
+      | Cond CONDAND Cond
+      | Cond CONDOR Cond
+      | ABREP Cond FECHAP
 
-RETURNFUN -> VAROPER
-           | OPERN VAROPER
-           | RETURNFUN OPER RETURNFUN
-           | '(' RETURNFUN ')'
+Conds -> MENOR
+       | MAIOR
+       | IGUAL
+       | DIFERENTE
+       | MAIORIGUAL
+       | MENORIGUAL
+       | IN
 
-OPERN -> '+'
-       | '-'
+Result -> Varoper
+        | Opern Varoper
+        | Result Oper Result
+        | ABREP Result FECHAP
 
-OPER -> OPERN
-      | '*'
-      | '/'
-      | '%'
-      | '&'
-      | '|'
-      | CONDS
+Opern -> ADD
+       | MINUS
 
-VAROPER -> VAR
-         |  NOMEFUN '(' ARGSFUN ')'
-         |  NOMEFUN '()'
+Oper -> Opern
+      | TIMES
+      | DIVIDE
+      | MOD
+      | OR
+      | AND
+      | Conds
 
-VAR -> NUMBER
+Varoper -> Var
+         | WORD ABREP Conjunto FECHAP
+         | WORD ABREP FECHAP
+
+Var -> NUMBER
      | BOOL
-     | LIST
-     | [A-Za-z]\w+
+     | List
+     | WORD
 
-NUMBER -> num 
-        | num '.' num
+List -> ABREL FECHAL
+      | ABREL Conjunto FECHAL
+      | ABREL Conjunto2 FECHAL
 
-BOOL -> 'true'
-      | 'false'
-
-LIST -> '[' ']'
-      | '[' ARGSFUN ']'
-      | '[' [A-Za-z]\w+ | [A-Za-z]\w+ ']'
+Cojunto2 -> Cojunto2 NEXT WORD
+          | WORD

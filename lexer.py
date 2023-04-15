@@ -1,6 +1,7 @@
 from ply.lex import lex
 
 # Falar dos tokens: # : ; then
+# Falar de word não começar com números
 # Exemplos
 
 tokens = (
@@ -36,185 +37,197 @@ tokens = (
     'RETURN',       # return
     'ABREL',        # [
     'FECHAL',       # ]
-    'COMMENT',      # #
     'NEXT',         # :
-    'PV'            # ;
+    'PV',           # ;
+    'REST'
 )
 
-def t_VIR(t):
+states = (('FPYTHON','inclusive'),)
+
+t_ignore = ' \t\n'
+
+def t_FPYTHON_VIR(t):
     r','
-    print(',',end=' ')
+    # print(',',end=' ')
     return t
 
-def t_ADD(t):
+def t_FPYTHON_ADD(t):
     r'\+'
-    print(t.value,end=' ')
+    # print(t.value,end=' ')
     return t
 
-def t_MINUS(t):
+def t_FPYTHON_MINUS(t):
     r'\-'
-    print(t.value,end=' ')
+    # print(t.value,end=' ')
     return t
 
-def t_OR(t):
+def t_FPYTHON_OR(t):
     r'\|'
-    print(t.value,end=' ')
+    # print(t.value,end=' ')
     return t
 
-def t_AND(t):
+def t_FPYTHON_AND(t):
     r'&'
-    print(t.value,end=' ')
+    # print(t.value,end=' ')
     return t
 
-def t_DIVIDE(t):
+def t_FPYTHON_DIVIDE(t):
     r'\/'
-    print(t.value,end=' ')
+    # print(t.value,end=' ')
     return t
 
-def t_TIMES(t):
+def t_FPYTHON_TIMES(t):
     r'\*'
-    print(t.value,end=' ')
+    # print(t.value,end=' ')
     return t
 
-def t_MOD(t):
+def t_FPYTHON_MOD(t):
     r'%'
-    print(t.value,end=' ')
+    # print(t.value,end=' ')
     return t
 
-def t_ABREFP(t):
+def t_INITIAL_ABREFP(t):
     r'"""(?i:FPYTHON)'
-    print('Inicializa FPYTHON')
+    t.lexer.begin('FPYTHON')
+    # print('---------------------------Comeca FPYTHON-------------------------')
+    # print('Inicializa FPYTHON')
     return t
 
-def t_FECHAFP(t):
+def t_FPYTHON_FECHAFP(t):
     r'"""'
-    print('Acaba FPYTHON')
-    print('==========================')
+    t.lexer.begin('INITIAL')
+    # print('---------------------------Acaba FPYTHON-------------------------')
+    # print('Acaba FPYTHON')
+    # print('==========================')
     return t
 
-def t_FUNABRE(t):
+def t_FPYTHON_FUNABRE(t):
     r'deff'
-    print('----------------Abre função----------------------')
+    # print('----------------Abre função----------------------')
     return t
 
-def t_BOOL(t):
+def t_FPYTHON_BOOL(t):
     r'(true|false)'
-    print(f'Booleano {t.value}',end=' ')
+    # print(f'Booleano {t.value}',end=' ')
     return t
 
-def t_ABREL(t):
+def t_FPYTHON_ABREL(t):
     r'\['
-    print('[',end=' ')
+    # print('[',end=' ')
     return t
 
-def t_FECHAL(t):
+def t_FPYTHON_FECHAL(t):
     r'\]'
-    print(']',end=' ')
+    # print(']',end=' ')
     return t
 
-def t_ABREP(t):
+def t_FPYTHON_ABREP(t):
     r'\('
-    print('(',end=' ')
+    # print('(',end=' ')
     return t
 
-def t_FECHAP(t):
+def t_FPYTHON_FECHAP(t):
     r'\)'
-    print(')')
+    # print(')')
     return t
 
-def t_FUNFECHA(t):
+def t_FPYTHON_FUNFECHA(t):
     r'end'
-    print('--------------Termina função---------------------')
+    # print('--------------Termina função---------------------')
     return t
 
-def t_IF(t):
+def t_FPYTHON_IF(t):
     r'if'
-    print('if')
+    # print('if')
     return t
 
-def t_ELSE(t):
+def t_FPYTHON_ELSE(t):
     r'else'
-    print('else')
+    # print('else')
     return t
 
-def t_MENOR(t):
+def t_FPYTHON_MENOR(t):
     r'<'
-    print('<',end=' ')
+    # print('<',end=' ')
     return t
 
-def t_MAIOR(t):
+def t_FPYTHON_MAIOR(t):
     r'>'
-    print('>',end=' ')
+    # print('>',end=' ')
     return t
 
-def t_MENORIGUAL(t):
+def t_FPYTHON_MENORIGUAL(t):
     r'<='
-    print('<=',end=' ')
+    # print('<=',end=' ')
     return t
 
-def t_MAIORIGUAL(t):
+def t_FPYTHON_MAIORIGUAL(t):
     r'>='
-    print('>=',end=' ')
+    # print('>=',end=' ')
     return t
 
-def t_IGUAL(t):
+def t_FPYTHON_IGUAL(t):
     r'=='
-    print('==',end=' ')
+    # print('==',end=' ')
     return t
 
-def t_IN(t):
+def t_FPYTHON_IN(t):
     r'in'
-    print('in',end=' ')
+    # print('in',end=' ')
     return t
 
-def t_NOT(t):
+def t_FPYTHON_NOT(t):
     r'not'
-    print('not',end=' ')
+    # print('not',end=' ')
     return t
 
-def t_DIFERENTE(t):
+def t_FPYTHON_DIFERENTE(t):
     r'!='
-    print('!=',end=' ')
+    # print('!=',end=' ')
     return t
 
-def t_CONDAND(t):
+def t_FPYTHON_CONDAND(t):
     r'and'
-    print('and',end=' ')
+    # print('and',end=' ')
     return t
 
-def t_CONDOR(t):
+def t_FPYTHON_CONDOR(t):
     r'or'
-    print('or',end=' ')
+    # print('or',end=' ')
     return t
 
-def t_RETURN(t):
+def t_FPYTHON_RETURN(t):
     r'return'
-    print('Return' ,end=' ')
+    # print('Return' ,end=' ')
     return t
 
-def t_NEXT(t):
+def t_FPYTHON_NEXT(t):
     r':'
-    print(':',end=' ')
+    # print(':',end=' ')
     return t
 
-def t_PV(t):
+def t_FPYTHON_PV(t):
     r';'
-    print(';')
+    # print(';')
     return t
 
-def t_COMMENT(t):
-    r'\#'
-    print('Comentário')
-    return t
+# def t_COMMENT(t):
+#     r'\#'
+#     # print('Comentário')
+#     return t
 
-def t_NUMBER(t):
+def t_FPYTHON_NUMBER(t):
     r'\d+(\.d+)?'
-    print(f'Argumento número {t.value}',end=' ')
+    # print(f'Argumento número {t.value}',end=' ')
     return t
 
-def t_WORD(t):
-    r'[A-Za-z]\w+'
-    print(f'Palavra {t.value}',end=' ')
+def t_FPYTHON_WORD(t):
+    r'[A-Za-z_]\w*'
+    # print(f'Palavra {t.value}',end=' ')
+    return t
+
+def t_INITIAL_REST(t):
+    r'(?:(?!""").)+'
     return t
 
 def t_error(t):
@@ -262,7 +275,7 @@ end
 
 lista = [1,2,3,4,5,6,3,4,51,243,13,53,32]
 soma = f_eliminarepetidos_(lista)
-print(soma)
+# print(soma)
 '''
 
 inp = '''
@@ -349,12 +362,14 @@ end
 
 x = 4
 y = f_mais_um_(x)
-print(y)
+# print(y)
 l = [1,2,3,4,5]
 sum_l = f_sum_(l)
-print(sum_l)
+# print(sum_l)
 '''
 lexer.input(inp2)
 t = lexer.token()
 while(t):
+    # if t.type != 'error':
+    #     print(t)
     t = lexer.token()
