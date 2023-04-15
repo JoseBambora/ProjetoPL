@@ -41,12 +41,12 @@ end
             {
                 'args': [x,y],
                 'condicoes': [],
-                'resultado': [x,+,y]
+                'resultado': [[x,+,y]]
             },
             {
                 'args': [x,0],
                 'condicoes': [],
-                'resultado': [x]
+                'resultado': [[x]]
             }
         ]
     },
@@ -56,7 +56,7 @@ end
             {
                 'args': [x,y],
                 'condicoes': [],
-                'resultado': [x,-,y]
+                'resultado': [[x,-,y]]
             }
         ]
     },
@@ -81,7 +81,7 @@ end
                 'condicoes': [
                     # ([cond],[then],[else])
                     # then ou else é número => número = indice do resultado
-                    ([b],[(b1,[0],[1])],[([b1],[2],[3])])
+                    ([b],[([b1],[0],[1])],[([b1],[2],[3])])
                 ],
                 'resultado': [
                     [x,*,-,1],
@@ -106,7 +106,7 @@ end
                 'args': ['[',h,':',t,']',num],
                 'condicoes': [],
                 'resultado': [
-                    ['[',h,':',add,'(',t,num,')',']']
+                    [['[',h,':',add,'(',t,',',num,')',']']]
                 ]
             }
         ]
