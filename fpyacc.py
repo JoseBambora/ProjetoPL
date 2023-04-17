@@ -197,15 +197,15 @@ def p_VAR_WORD(p):
 def p_List(p):
     '''
     List : ABREL FECHAL
-         | ABREL WORD NEXT Cojunto2 FECHAL
+         | ABREL WORD NEXT Conjunto2 FECHAL
          | ABREL Conjunto FECHAL
     '''
     return p
 
-def p_Cojunto2(p):
+def p_Conjunto2(p):
     '''
-    Cojunto2 : Cojunto2 NEXT WORD
-             | WORD
+    Conjunto2 : Conjunto2 NEXT WORD
+              | WORD
     '''
     return p
 
