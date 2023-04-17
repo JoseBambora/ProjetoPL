@@ -1,6 +1,7 @@
 import ply.yacc as yacc
 from lexer import lexer
 from lexer import tokens
+from condicoes import Condicoes
 
 def p_Codigo(p):
     '''Codigo : Codigo CodigoFun Python
@@ -39,6 +40,10 @@ def p_Funcao(p):
     Funcao : FUNABRE WORD ABREP Args FECHAP Corpofun FUNFECHA
            | FUNABRE WORD ABREP FECHAP Corpofun FUNFECHA'''
     print(f'Funçao nome: {p[2]}')
+    if p[6] == ']':
+        print(f'Função resultado:\n{p[5].toPython()}')
+    else:
+        print(f'Função resultado:\n{p[6].toPython()}')
     return p
 
 def p_Args(p):
@@ -60,27 +65,51 @@ def p_Conjunto(p):
 
 def p_Corpofun_RETURN(p):
     'Corpofun : RETURN Result PV'
-    print(f'Funcao {p[1]} {p[2]} {p[3]}')
+    # print(f'Funcao {p[1]} {p[2]} {p[3]}')
+    p[0] = 'Resultado'
     return p
 
 
 def p_Corpofun_IF(p):
     'Corpofun : IF ABREP Cond FECHAP Corpofun ELSE Corpofun'
-    print(f'Funcao {p[1]} {p[2]} {p[3]} {p[4]} {p[6]}')
+    # print(f'Funcao {p[1]} {p[2]} {p[3]} {p[4]} {p[6]}')
+    p[0] = Condicoes(p[3],p[5],p[7])
     return p
 
 
 def p_Cond(p):
     '''
     Cond : Varoper Conds Varoper
-         | NOT Cond
-         | Cond CONDAND Cond
-         | Cond CONDOR Cond
-         | ABREP Cond FECHAP
          | Varoper
     '''
-    if p[1] != None:
-        print(f'Cond {p[1]}')
+    if (len(p) > 2):
+        p[0] = p[1] + [p[2]] + p[3]
+    else:
+        p[0] = p[1]
+    return p
+
+def p_Cond_CONDAND(p):
+    'Cond : Cond CONDAND Cond'
+    p[0] = p[1] + ['and'] + p[3]
+    return p
+
+
+def p_Cond_CONDOR(p):
+    'Cond : Cond CONDOR Cond'
+    p[0] = p[1] + ['or'] + p[2]
+    return p
+
+def p_Cond_NOT(p):
+    'Cond : NOT Cond'
+    p[2].insert(0,p[1])
+    p[0] = p[2]
+    return p
+
+def p_Cond_ABREP(p):
+    'Cond : ABREP Cond FECHAP'
+    p[2].insert(0,p[1])
+    p[2].append(p[3])
+    p[0] = p[2]
     return p
 
 def p_Conds(p):
@@ -93,7 +122,8 @@ def p_Conds(p):
           | MENORIGUAL
           | IN
     '''
-    print(f'Condicao operador {p[1]}')
+    # print(f'Condicao operador {p[1]}')
+    p[0] = p[1]
     return p
 # n*(-1)
 def p_Result(p):
@@ -134,27 +164,33 @@ def p_Varoper(p):
             | Var
     '''
     if p[1] != None:
-        print(p[1])
+        p[0] = p[1]
+    if not isinstance(p[0],list):
+        p[0] = [p[0]]
     return p
 
 def p_Var_NUMBER(p):
     'Var : NUMBER'
     print(f'Número {p[1]}')
+    p[0] = p[1]
     return p
 
 def p_Var_BOOL(p):
     'Var : BOOL'
     print(f'Booleano: {p[1]}')
+    p[0] = p[1]
     return p
 
 def p_Var_List(p):
     'Var : List'
     print(f'Lista')
+    p[0] = p[1]
     return p
 
 def p_VAR_WORD(p):
     'Var : WORD'
     print(f'Variável: {p[1]}')
+    p[0] = p[1]
     return p
 
 
@@ -178,6 +214,8 @@ def p_Chamadafun(p):
     Chamadafun : WORD ABREP Conjunto FECHAP
                | WORD ABREP FECHAP
     '''
+    p[0] = [p[1]] + [p[2]] + [')']
+    return p
 
 def p_error(p):
     print('Erro ' + str(p))
@@ -185,14 +223,25 @@ def p_error(p):
 
 inp2 = '''
 """FPYTHON 
-deff div() 
-    if (not con2(t,n))
-        if(true)
-            return true;
+
+deff con2([h:t],n)
+    if (n == h)
+        if (not (con2(t,n) and con2(t,n)))
+            if(true)
+                return true;
+            else
+                return false;
         else
             return false;
-    else
-        return false; end"""
+    else 
+        if (con2(t,n))
+            if(true)
+                return true;
+            else
+                return false;
+        else
+            return false;
+end"""
 '''
 
 inp = '''
@@ -235,7 +284,7 @@ end
 
 deff con2([h:t],n)
     if (n == h)
-        if (not con2(t,n))
+        if (not (con2(t,n) and con2(t,n)))
             if(true)
                 return true;
             else
@@ -295,4 +344,4 @@ print(f_uminho_())
 '''
 
 parser = yacc.yacc()
-parser.parse(inp)
+parser.parse(inp2)
