@@ -2,6 +2,7 @@ import ply.yacc as yacc
 from lexer import lexer
 from lexer import tokens
 from condicoes import Condicoes
+from resultado import Resultado
 
 def p_Codigo(p):
     '''Codigo : Codigo CodigoFun Python
@@ -41,9 +42,9 @@ def p_Funcao(p):
            | FUNABRE WORD ABREP FECHAP Corpofun FUNFECHA'''
     print(f'Funçao nome: {p[2]}')
     if p[6] == ']':
-        print(f'Função resultado:\n{p[5].toPython()}')
+        print(f'Função resultado:\n{p[5]}') #meter toPython
     else:
-        print(f'Função resultado:\n{p[6].toPython()}')
+        print(f'Função resultado:\n{p[6]}') #meter toPython
     return p
 
 def p_Args(p):
@@ -65,8 +66,8 @@ def p_Conjunto(p):
 
 def p_Corpofun_RETURN(p):
     'Corpofun : RETURN Result PV'
-    # print(f'Funcao {p[1]} {p[2]} {p[3]}')
-    p[0] = 'Resultado'
+    #print(f'Funcao {p[1]} {p[2]} {p[3]}')
+    p[0] = Resultado(p[1],p[2],p[3]).pp()
     return p
 
 
@@ -133,7 +134,20 @@ def p_Result(p):
            | Result Oper Result
            | ABREP Result FECHAP
     '''
-    p[0] = 'result'
+    if (len(p) == 4):
+        if (p[2] in ['+','-','*','/','$','and','or','<','>','=','!=','>=','<=','in']):
+            p[0] = p[1] + [p[2]] + [p[3]]
+        elif(isinstance(p[2],list)):
+                p[0] = p[1] + str(p[2]) +p[3]
+        else:
+            p[0] = p[1] + p[2] + p[3]
+    elif (len(p) == 3):
+            if(isinstance(p[2],list)):
+                p[0] = p[1] + str(p[2])
+            else:
+                p[0] = p[1] + p[2]
+    else:
+        p[0] = p[1]
     return p
 
 def p_Opern(p):
@@ -142,6 +156,7 @@ def p_Opern(p):
           | MINUS
     '''
     print(p[1])
+    p[0] = p[1]
     return p
 
 def p_Oper(p):
@@ -156,6 +171,7 @@ def p_Oper(p):
     '''
     if p[1] != None:
         print(f'Operacao {p[1]}')
+    p[0]=p[1]
     return p
 
 def p_Varoper(p):
