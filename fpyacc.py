@@ -1,8 +1,10 @@
 import ply.yacc as yacc
 from lexer import lexer
 from lexer import tokens
+from base import Base
 from condicoes import Condicoes
 from resultado import Resultado
+
 
 def p_Codigo(p):
     '''Codigo : Codigo CodigoFun Python
@@ -13,9 +15,11 @@ def p_Codigo(p):
               | CodigoFun'''
     return p
 
+
 def p_CodigoFun(p):
     'CodigoFun : ABREFP Fpython FECHAFP'
     return p
+
 
 def p_Python(p):
     '''
@@ -28,6 +32,7 @@ def p_Python(p):
         print(f'Código Python {p[2]}')
     return p
 
+
 def p_Fpython(p):
     '''
     Fpython : Fpython Funcao
@@ -36,25 +41,38 @@ def p_Fpython(p):
     print('=============================')
     return p
 
+
 def p_Funcao(p):
     '''
     Funcao : FUNABRE WORD ABREP Args FECHAP Corpofun FUNFECHA
            | FUNABRE WORD ABREP FECHAP Corpofun FUNFECHA'''
-    print(f'Funçao nome: {p[2]}')
-    if p[6] == ']':
-        print(f'Função resultado:\n{p[5]}') #meter toPython
+    if p[4] == ')':
+        print(f'def {p[2]}()')
     else:
-        print(f'Função resultado:\n{p[6]}') #meter toPython
+        print(f'def {p[2]}{p[4].toPythonBase()}')
+
+    if p[6] == ']':
+        print(f'Função resultado:\n{p[5]}')  # meter toPython
+    else:
+        print(f'Função resultado:\n{p[6]}')  # meter toPython
     return p
 
-def p_Args(p):
+
+def p_Args(p):  # Not working
     '''
     Args : Var
          | Opern Var
          | Args VIR Var
          | Args VIR Opern Var
     '''
+    if p[1] == '+' or p[1] == '-':      # Opern Var
+        p[0] = Base(p[2])
+    elif p[3] == '+' or p[3] == '-':    # Args VIR Opern Var
+        p[0] = Base(p[1], p[4])
+    else:                               # Var e Args VIR Var
+        p[0] = Base(p[1], p[3])
     return p
+
 
 def p_Conjunto(p):
     '''
@@ -64,17 +82,18 @@ def p_Conjunto(p):
     '''
     return p
 
+
 def p_Corpofun_RETURN(p):
     'Corpofun : RETURN Result PV'
-    #print(f'Funcao {p[1]} {p[2]} {p[3]}')
-    p[0] = Resultado(p[1],p[2],p[3]).pp()
+    # print(f'Funcao {p[1]} {p[2]} {p[3]}')
+    p[0] = Resultado(p[1], p[2], p[3]).pp()
     return p
 
 
 def p_Corpofun_IF(p):
     'Corpofun : IF ABREP Cond FECHAP Corpofun ELSE Corpofun'
     # print(f'Funcao {p[1]} {p[2]} {p[3]} {p[4]} {p[6]}')
-    p[0] = Condicoes(p[3],p[5],p[7])
+    p[0] = Condicoes(p[3], p[5], p[7])
     return p
 
 
@@ -89,6 +108,7 @@ def p_Cond(p):
         p[0] = p[1]
     return p
 
+
 def p_Cond_CONDAND(p):
     'Cond : Cond CONDAND Cond'
     p[0] = p[1] + ['and'] + p[3]
@@ -100,18 +120,21 @@ def p_Cond_CONDOR(p):
     p[0] = p[1] + ['or'] + p[2]
     return p
 
+
 def p_Cond_NOT(p):
     'Cond : NOT Cond'
-    p[2].insert(0,p[1])
+    p[2].insert(0, p[1])
     p[0] = p[2]
     return p
 
+
 def p_Cond_ABREP(p):
     'Cond : ABREP Cond FECHAP'
-    p[2].insert(0,p[1])
+    p[2].insert(0, p[1])
     p[2].append(p[3])
     p[0] = p[2]
     return p
+
 
 def p_Conds(p):
     '''
@@ -126,6 +149,8 @@ def p_Conds(p):
     # print(f'Condicao operador {p[1]}')
     p[0] = p[1]
     return p
+
+
 # n*(-1)
 def p_Result(p):
     '''
@@ -135,20 +160,21 @@ def p_Result(p):
            | ABREP Result FECHAP
     '''
     if (len(p) == 4):
-        if (p[2] in ['+','-','*','/','$','and','or','<','>','=','!=','>=','<=','in']):
+        if (p[2] in ['+', '-', '*', '/', '$', 'and', 'or', '<', '>', '=', '!=', '>=', '<=', 'in']):
             p[0] = p[1] + [p[2]] + [p[3]]
-        elif(isinstance(p[2],list)):
-                p[0] = p[1] + str(p[2]) +p[3]
+        elif (isinstance(p[2], list)):
+            p[0] = p[1] + str(p[2]) + p[3]
         else:
             p[0] = p[1] + p[2] + p[3]
     elif (len(p) == 3):
-            if(isinstance(p[2],list)):
-                p[0] = p[1] + str(p[2])
-            else:
-                p[0] = p[1] + p[2]
+        if (isinstance(p[2], list)):
+            p[0] = p[1] + str(p[2])
+        else:
+            p[0] = p[1] + p[2]
     else:
         p[0] = p[1]
     return p
+
 
 def p_Opern(p):
     '''
@@ -158,6 +184,7 @@ def p_Opern(p):
     print(p[1])
     p[0] = p[1]
     return p
+
 
 def p_Oper(p):
     '''
@@ -171,8 +198,9 @@ def p_Oper(p):
     '''
     if p[1] != None:
         print(f'Operacao {p[1]}')
-    p[0]=p[1]
+    p[0] = p[1]
     return p
+
 
 def p_Varoper(p):
     '''
@@ -181,9 +209,10 @@ def p_Varoper(p):
     '''
     if p[1] != None:
         p[0] = p[1]
-    if not isinstance(p[0],list):
+    if not isinstance(p[0], list):
         p[0] = [p[0]]
     return p
+
 
 def p_Var_NUMBER(p):
     'Var : NUMBER'
@@ -191,17 +220,20 @@ def p_Var_NUMBER(p):
     p[0] = p[1]
     return p
 
+
 def p_Var_BOOL(p):
     'Var : BOOL'
     print(f'Booleano: {p[1]}')
     p[0] = p[1]
     return p
 
+
 def p_Var_List(p):
     'Var : List'
     print(f'Lista')
     p[0] = p[1]
     return p
+
 
 def p_VAR_WORD(p):
     'Var : WORD'
@@ -218,12 +250,14 @@ def p_List(p):
     '''
     return p
 
+
 def p_Conjunto2(p):
     '''
     Conjunto2 : Conjunto2 NEXT WORD
               | WORD
     '''
     return p
+
 
 def p_Chamadafun(p):
     '''
@@ -233,9 +267,11 @@ def p_Chamadafun(p):
     p[0] = [p[1]] + [p[2]] + [')']
     return p
 
+
 def p_error(p):
     print('Erro ' + str(p))
     return p
+
 
 inp2 = '''
 """FPYTHON 
