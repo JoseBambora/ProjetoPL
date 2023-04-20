@@ -114,7 +114,7 @@ def p_Conjunto_Result(p):
 def p_Corpofun_RETURN(p):
     'Corpofun : RETURN Result PV'
     # print(f'Funcao {p[1]} {p[2]} {p[3]}')
-    p[0] = Resultado(p[1], p[2], p[3]).pp()
+    p[0] = Resultado(p[1], p[2], p[3]).toPython()
     return p
 
 
