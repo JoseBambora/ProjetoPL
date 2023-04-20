@@ -19,4 +19,4 @@ class Resultado:
             if m!= None:
                 elem = '-'+m.group(1)
             res=res+elem
-        return getImut(res)
+        return 'return '+getImut(res)
