@@ -15,11 +15,9 @@ def p_Codigo(p):
               | CodigoFun'''
     return p
 
-
 def p_CodigoFun(p):
     'CodigoFun : ABREFP Fpython FECHAFP'
     return p
-
 
 def p_Python(p):
     '''
@@ -32,7 +30,25 @@ def p_Python(p):
         print(f'Código Python {p[2]}')
     return p
 
+# deff uminho([h:t:t2:t3]):
+#       return 0;
+# end
 
+# def uminho(l):
+#   h = l[0]
+#   t = l[1]
+#   t2 = l[2]
+#   t3 = l[3:]
+#   return 0
+#
+
+# h:t
+# cabeca = lista[0]
+# cauda = lista[1:]
+# h:h2:t
+# cabeca = lista[0]
+# cabeca2 = lista[1]
+# cauda = lista[2:]
 def p_Fpython(p):
     '''
     Fpython : Fpython Funcao
@@ -41,45 +57,57 @@ def p_Fpython(p):
     print('=============================')
     return p
 
+def p_Funcao_Args(p):
+    'Funcao : FUNABRE WORD ABREP Args FECHAP Corpofun FUNFECHA'    
+    print(f'def {p[2]} {p[4]}')
+    print(f'Função resultado:\n{p[6]}')  # meter toPython
+    return p
 
 def p_Funcao(p):
-    '''
-    Funcao : FUNABRE WORD ABREP Args FECHAP Corpofun FUNFECHA
-           | FUNABRE WORD ABREP FECHAP Corpofun FUNFECHA'''
-    if p[4] == ')':
-        print(f'def {p[2]}()')
-    else:
-        print(f'def {p[2]}{p[4].toPythonBase()}')
-
-    if p[6] == ']':
-        print(f'Função resultado:\n{p[5]}')  # meter toPython
-    else:
-        print(f'Função resultado:\n{p[6]}')  # meter toPython
+    'Funcao : FUNABRE WORD ABREP FECHAP Corpofun FUNFECHA'
+    print(f'def {p[2]}()')
+    print(f'Função resultado:\n{p[5]}')  # meter toPython
     return p
 
+def p_Args_Var(p):
+    'Args : Var'
+    p[0] = [p[1]]
+    return p
 
+def p_Args_Opern(p):
+    'Args : Opern Var'
+    p[0] = [p[1]] + [p[2]]
+ 
 def p_Args(p):  # Not working
     '''
-    Args : Var
-         | Opern Var
-         | Args VIR Var
+    Args : Args VIR Var
          | Args VIR Opern Var
     '''
-    if p[1] == '+' or p[1] == '-':      # Opern Var
-        p[0] = Base(p[2])
-    elif p[3] == '+' or p[3] == '-':    # Args VIR Opern Var
-        p[0] = Base(p[1], p[4])
-    else:                               # Var e Args VIR Var
-        p[0] = Base(p[1], p[3])
+    p[0] = p[1]
+    if len(p) == 4:
+        p[0] += [p[3]]
+    else:
+        p[0] += [p[3]] + [p[4]]
+    # if p[1] == '+' or p[1] == '-':      # Opern Var
+    #     p[0] = Base(p[2])
+    # elif p[3] == '+' or p[3] == '-':    # Args VIR Opern Var
+    #     p[0] = Base(p[1], p[4])
+    # else:                               # Var e Args VIR Var
+    #     p[0] = Base(p[1], p[3])
     return p
 
-
 def p_Conjunto(p):
-    '''
-    Conjunto : Conjunto VIR Var
-             | Conjunto VIR Opern Var
-             | Result
-    '''
+    'Conjunto : Conjunto VIR Result'
+    if(not isinstance(p[3],list)):
+        p[3] = [p[3]]
+    p[0] = p[1] + [p[2]] + p[3]
+    if len(p) == 5:
+        p[0] += p[4]
+    return p
+
+def p_Conjunto_Result(p):
+    'Conjunto : Result'
+    p[0] = p[1]
     return p
 
 
@@ -96,43 +124,43 @@ def p_Corpofun_IF(p):
     p[0] = Condicoes(p[3], p[5], p[7])
     return p
 
+def p_Cond_CondSimple(p):
+    'Cond : CondSimple'
+    p[0] = p[1]
+    return p
 
-def p_Cond(p):
+def p_Cond_CONDAND(p):
+    'Cond : Cond CONDAND CondSimple'
+    p[0] = p[1] + ['and'] + p[3]
+    return p
+
+def p_Cond_CONDOR(p):
+    'Cond : Cond CONDOR CondSimple'
+    p[0] = p[1] + ['or'] + p[3]
+    return p
+
+def p_CondSimple_ABREP(p):
+    'CondSimple : ABREP Cond FECHAP'
+    p[2].insert(0,p[1])
+    p[2].append(p[3])
+    p[0] = p[2]
+    return p
+
+def p_Cond_NOT(p):
+    'Cond : NOT CondSimple'
+    p[2].insert(0,p[1])
+    p[0] = p[2]
+    return p
+
+def p_CondSimple(p):
     '''
-    Cond : Varoper Conds Varoper
-         | Varoper
+    CondSimple : Varoper Conds Varoper
+               | Varoper
     '''
     if (len(p) > 2):
         p[0] = p[1] + [p[2]] + p[3]
     else:
         p[0] = p[1]
-    return p
-
-
-def p_Cond_CONDAND(p):
-    'Cond : Cond CONDAND Cond'
-    p[0] = p[1] + ['and'] + p[3]
-    return p
-
-
-def p_Cond_CONDOR(p):
-    'Cond : Cond CONDOR Cond'
-    p[0] = p[1] + ['or'] + p[2]
-    return p
-
-
-def p_Cond_NOT(p):
-    'Cond : NOT Cond'
-    p[2].insert(0, p[1])
-    p[0] = p[2]
-    return p
-
-
-def p_Cond_ABREP(p):
-    'Cond : ABREP Cond FECHAP'
-    p[2].insert(0, p[1])
-    p[2].append(p[3])
-    p[0] = p[2]
     return p
 
 
@@ -151,28 +179,31 @@ def p_Conds(p):
     return p
 
 
-# n*(-1)
 def p_Result(p):
     '''
     Result : Varoper
            | Opern Varoper
-           | Result Oper Result
+           | Result Oper Varoper
            | ABREP Result FECHAP
+           | Result Oper ABREP Result FECHAP
     '''
-    if (len(p) == 4):
-        if (p[2] in ['+', '-', '*', '/', '$', 'and', 'or', '<', '>', '=', '!=', '>=', '<=', 'in']):
+    if(len(p) == 6):
+        p[0] = p[1] + [p[2]] + [p[3]]+ [p[4]] + [p[5]]
+    elif (len(p) == 4):
+        if (p[2] in ['+','-','*','/','$','and','or','<','>','=','!=','>=','<=','in']):
             p[0] = p[1] + [p[2]] + [p[3]]
-        elif (isinstance(p[2], list)):
-            p[0] = p[1] + str(p[2]) + p[3]
+        elif(isinstance(p[2],list)):
+            p[0] = p[1] + str(p[2]) +p[3]
         else:
             p[0] = p[1] + p[2] + p[3]
     elif (len(p) == 3):
-        if (isinstance(p[2], list)):
+        if(isinstance(p[2],list)):
             p[0] = p[1] + str(p[2])
         else:
             p[0] = p[1] + p[2]
     else:
         p[0] = p[1]
+    print(p[0])
     return p
 
 
@@ -184,7 +215,6 @@ def p_Opern(p):
     print(p[1])
     p[0] = p[1]
     return p
-
 
 def p_Oper(p):
     '''
@@ -201,7 +231,6 @@ def p_Oper(p):
     p[0] = p[1]
     return p
 
-
 def p_Varoper(p):
     '''
     Varoper : Chamadafun
@@ -213,13 +242,11 @@ def p_Varoper(p):
         p[0] = [p[0]]
     return p
 
-
 def p_Var_NUMBER(p):
     'Var : NUMBER'
     print(f'Número {p[1]}')
     p[0] = p[1]
     return p
-
 
 def p_Var_BOOL(p):
     'Var : BOOL'
@@ -227,13 +254,11 @@ def p_Var_BOOL(p):
     p[0] = p[1]
     return p
 
-
 def p_Var_List(p):
     'Var : List'
     print(f'Lista')
     p[0] = p[1]
     return p
-
 
 def p_VAR_WORD(p):
     'Var : WORD'
@@ -241,30 +266,40 @@ def p_VAR_WORD(p):
     p[0] = p[1]
     return p
 
+def p_List_Vazia(p):
+    'List : ABREL FECHAL'
+    p[0] = ['[',']']
+    return p
+
+def p_List_Estatica(p):
+    'List : ABREL Conjunto FECHAL' 
+    p[0] = [p[1]] + p[2] + [p[3]]
+    return p
 
 def p_List(p):
-    '''
-    List : ABREL FECHAL
-         | ABREL WORD NEXT Conjunto2 FECHAL
-         | ABREL Conjunto FECHAL
-    '''
+    'List : ABREL WORD NEXT Conjunto2 FECHAL'
+    p[0] = [p[1]] + [p[2],p[3]] + p[4] + [p[5]]
+    p[0] = (...)
     return p
 
+def p_Conjunto2_Word(p):
+    'Conjunto2 : WORD'
+    p[0] = [p[1]]
+    return p
 
 def p_Conjunto2(p):
-    '''
-    Conjunto2 : Conjunto2 NEXT WORD
-              | WORD
-    '''
+    'Conjunto2 : Conjunto2 NEXT WORD'
+    p[0] = p[1] + [p[2],p[3]]
     return p
 
+def p_Chamadafun_NoArgs(p):
+    'Chamadafun : WORD ABREP FECHAP'   
+    p[0] = [p[1],p[2],p[3]]
+    return p 
 
 def p_Chamadafun(p):
-    '''
-    Chamadafun : WORD ABREP Conjunto FECHAP
-               | WORD ABREP FECHAP
-    '''
-    p[0] = [p[1]] + [p[2]] + [')']
+    'Chamadafun : WORD ABREP Conjunto FECHAP'
+    p[0] = [p[1], p[2]] + p[3] + [p[4]]
     return p
 
 
@@ -276,7 +311,7 @@ def p_error(p):
 inp2 = '''
 """FPYTHON 
 
-deff con2([h:t],n)
+deff con2([h:t:t2:t3:t4],n)
     if (n == h)
         if (not (con2(t,n) and con2(t,n)))
             if(true)
@@ -395,5 +430,5 @@ end
 print(f_uminho_())
 '''
 
-parser = yacc.yacc()
-parser.parse(inp2)
+parser = yacc.yacc(debug=True)
+parser.parse(inp)
