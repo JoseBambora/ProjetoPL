@@ -1,4 +1,5 @@
 import re
+from imutable import getImut
 class Resultado:
 
     def __init__(self, ret, valorRet, pv):
@@ -18,4 +19,4 @@ class Resultado:
             if m!= None:
                 elem = '-'+m.group(1)
             res=res+elem
-        return res
+        return getImut(res)

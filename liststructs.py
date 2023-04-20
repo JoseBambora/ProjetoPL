@@ -1,3 +1,5 @@
+from imutable import getImut
+
 class ListVar:
     def __init__(self,elem,rest,leter):
         self.l = list(filter(lambda s : s != ':',rest))
@@ -13,7 +15,7 @@ class ListVar:
     def toPythonRes(self):
         res = self.l[:-1]
         cab = ','.join(res)
-        return f'[{cab}] + copy.deepcopy({self.l[-1]})'
+        return f'[{cab}] + {self.l[-1]}'
     def getName(self):
         return self.leter
     def setName(self,leter):
@@ -26,10 +28,13 @@ class ListStatic:
         self.l = list(filter(lambda s : s != ',',elems))
         self.leter = leter 
     def toPythonArgs(self,numtabs=1):
+        res = []
         t = '\t'*numtabs
-        return f'{t}if len({self.leter}) == {len(self.l)}:'
+        for e in range(0,len(self.l)):
+            res.append(f'{t}{self.l[e]} = {self.leter}[{e}]')
+        return '\n'.join(res)
     def toPythonRes(self):
-        return f'copy.deepcopy({self.leter})'
+        return f'{self.leter}'
     def getName(self):
         return self.leter
     def setName(self,leter):

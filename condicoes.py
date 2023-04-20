@@ -1,3 +1,4 @@
+from resultado import Resultado
 class Condicoes:
     def __init__(self,condicao,corpothen,corpoelse):
         self.struct = (condicao,corpothen,corpoelse)
@@ -9,12 +10,12 @@ class Condicoes:
         tabs = '\t'*tab
         print(self.struct[0])
         cond = ' '.join(self.struct[0])
-        if isinstance(self.struct[1], str):
-            then = f'{tabs}\tResultado'
+        if isinstance(self.struct[1], Resultado):
+            then = f'{tabs}\t{self.struct[1].toPython()}'
         else:
             then = self.struct[1].toPythonAux(tab+1)
-        if isinstance(self.struct[2], str):
-            corpoelse = f'{tabs}\tResultado'
+        if isinstance(self.struct[2], Resultado):
+            corpoelse = f'{tabs}\t{self.struct[2].toPython()}'
         else:
             corpoelse = self.struct[2].toPythonAux(tab+1)
         return f'{tabs}if {cond}:\n{then}\n{tabs}else:\n{corpoelse}'
@@ -22,8 +23,5 @@ class Condicoes:
         return self.toPythonAux(1)
 
     def __str__(self):
-        c1 = str(self.struct[0])
-        c2 = str(self.struct[1])
-        c3 = str(self.struct[2])
-        return f'({c1},{c2},{c3})'
+        return self.toPython()
         

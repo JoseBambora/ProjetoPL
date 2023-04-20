@@ -6,6 +6,7 @@ from condicoes import Condicoes
 from resultado import Resultado
 from liststructs import ListVar
 from liststructs import ListStatic
+from imutable import getImut
 
 
 def p_Codigo(p):
@@ -78,14 +79,14 @@ def trata_funcao(p):
 def p_Funcao_Args(p):
     'Funcao : FUNABRE WORD ABREP Args FECHAP Corpofun FUNFECHA'    
     print(f'def {p[2]} {p[4]}')
-    print(f'Função resultado:\n{p[6]}')  # meter toPython
+    print(f'Função resultado:\n{p[6].toPython()}')  # meter toPython
     trata_funcao(p)
     return p
 
 def p_Funcao(p):
     'Funcao : FUNABRE WORD ABREP FECHAP Corpofun FUNFECHA'
     print(f'def {p[2]}()')
-    print(f'Função resultado:\n{p[5]}')  # meter toPython
+    print(f'Função resultado:\n{p[5].toPython()}')  # meter toPython
     trata_funcao(p)
     return p
 
@@ -137,7 +138,7 @@ def p_Conjunto_Result(p):
 def p_Corpofun_RETURN(p):
     'Corpofun : RETURN Result PV'
     # print(f'Funcao {p[1]} {p[2]} {p[3]}')
-    p[0] = Resultado(p[1], p[2], p[3]).toPython()
+    p[0] = Resultado(p[1], p[2], p[3])
     return p
 
 
@@ -276,7 +277,7 @@ def p_Var_NUMBER(p):
 def p_Var_BOOL(p):
     'Var : BOOL'
     print(f'Booleano: {p[1]}')
-    p[0] = p[1]
+    p[0] = p[1].capitalize()
     return p
 
 def p_Var_List(p):
@@ -332,6 +333,8 @@ def p_Chamadafun_NoArgs(p):
 
 def p_Chamadafun(p):
     'Chamadafun : WORD ABREP Conjunto FECHAP'
+    for e in range(0,len(p[3]),2):
+        p[3][e] = getImut(p[3][e])
     p[0] = [p[1], p[2]] + p[3] + [p[4]]
     return p
 
@@ -343,6 +346,10 @@ def p_error(p):
 
 inp2 = '''
 """FPYTHON 
+
+deff con2([h:t:t2:t3:t4],n)
+    return seila(t) + seila(t2) + seila(t3);
+end
 
 deff con2([h:t:t2:t3:t4],n)
     if (n == h)
