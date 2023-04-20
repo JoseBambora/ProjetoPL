@@ -261,7 +261,9 @@ def p_Varoper(p):
     '''
     if p[1] != None:
         p[0] = p[1]
-    if not isinstance(p[0], list):
+    if isinstance(p[1],str) and p.parser.listasnomes.__contains__(p[1]):
+        p[0] = str(p.parser.listasnomes[p[1]])
+    elif not isinstance(p[0], list):
         p[0] = [p[0]]
     return p
 
@@ -295,8 +297,6 @@ def p_List_Vazia(p):
     p[0] = name
     lista = ListStatic([],name)
     p.parser.listasnomes[name] = lista
-    print(lista.toPythonArgs())
-    print(lista.toPythonRes())
     return p
 
 def p_List_Estatica(p):
@@ -305,8 +305,6 @@ def p_List_Estatica(p):
     p[0] = name
     lista = ListStatic(p[2],name)
     p.parser.listasnomes[name] = lista
-    print(lista.toPythonArgs())
-    print(lista.toPythonRes())
     return p
 
 def p_List(p):
@@ -315,8 +313,6 @@ def p_List(p):
     lista = ListVar(p[2],p[4],name)
     p[0] = name
     p.parser.listasnomes[name] = lista
-    print(lista.toPythonArgs())
-    print(lista.toPythonRes())
     return p
 
 def p_Conjunto2_Word(p):
@@ -352,7 +348,7 @@ deff con2([h:t:t2:t3:t4],n)
     if (n == h)
         if (not (con2(t,n) and con2(t,n)))
             if(true)
-                return true;
+                return [h:t:t2:t3:t4];
             else
                 return false;
         else
