@@ -19,7 +19,7 @@ class ListVar:
     def setName(self,leter):
         self.leter = leter
     def __str__(self):
-        return str(self.l)
+        return self.toPythonRes()
     
 class ListStatic:
     def __init__(self,elems,leter):
@@ -35,4 +35,4 @@ class ListStatic:
     def setName(self,leter):
         self.leter = leter
     def __str__(self):
-        return str(self.l)
+        return self.toPythonRes()
