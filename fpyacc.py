@@ -54,6 +54,19 @@ def p_Fpython(p):
     Fpython : Fpython Funcao
             | Funcao
     '''
+    funcao = p[2]
+    p.yacc.funcoes = []
+    b = False
+    i = 0
+    for f in p.yacc.funcoes:
+        if f['nome'] == funcao['nome']:
+            b = True
+            break
+        i+=1
+    if not b:
+        p.yacc.funcoes.append(funcao)
+    else:
+        dec = p.yacc.funcoes[i]
     print('=============================')
     return p
 

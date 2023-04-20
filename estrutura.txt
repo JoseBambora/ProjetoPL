@@ -40,8 +40,7 @@ end
         'implementacoes':[
             {
                 'args': [x,y],
-                'condicoes': [],
-                'resultado': [[x,+,y]]
+                'corpofun': [x,+,y]
             },
             {
                 'args': [x,0],
@@ -78,16 +77,10 @@ end
         'implementacoes':[
             {
                 'args': [x,b,b1],
-                'condicoes': [
+                'corpofun': [
                     # ([cond],[then],[else])
                     # then ou else é número => número = indice do resultado
-                    ([b],[([b1],[0],[1])],[([b1],[2],[3])])
-                ],
-                'resultado': [
-                    [x,*,-,1],
-                    [x,*,-,2],
-                    [x],
-                    [x,*,2]
+                    ([b],[([b1], [x,*,-,1],[x,*,-,2])],[([b1],[2],[3])])
                 ]
             }
         ]
