@@ -4,6 +4,8 @@ from lexer import tokens
 from base import Base
 from condicoes import Condicoes
 from resultado import Resultado
+from liststructs import ListVar
+from liststructs import ListStatic
 
 
 def p_Codigo(p):
@@ -54,37 +56,45 @@ def p_Fpython(p):
     Fpython : Fpython Funcao
             | Funcao
     '''
-    funcao = p[2]
-    p.yacc.funcoes = []
-    b = False
-    i = 0
-    for f in p.yacc.funcoes:
-        if f['nome'] == funcao['nome']:
-            b = True
-            break
-        i+=1
-    if not b:
-        p.yacc.funcoes.append(funcao)
-    else:
-        dec = p.yacc.funcoes[i]
+    # funcao = p[2]
+    # p.yacc.funcoes = []
+    # b = False
+    # i = 0
+    # for f in p.yacc.funcoes:
+    #     if f['nome'] == funcao['nome']:
+    #         b = True
+    #         break
+    #     i+=1
+    # if not b:
+    #     p.yacc.funcoes.append(funcao)
+    # else:
+    #     dec = p.yacc.funcoes[i]
     print('=============================')
     return p
+
+def trata_funcao(p):
+    p.parser.listasnomes = {}
 
 def p_Funcao_Args(p):
     'Funcao : FUNABRE WORD ABREP Args FECHAP Corpofun FUNFECHA'    
     print(f'def {p[2]} {p[4]}')
     print(f'Função resultado:\n{p[6]}')  # meter toPython
+    trata_funcao(p)
     return p
 
 def p_Funcao(p):
     'Funcao : FUNABRE WORD ABREP FECHAP Corpofun FUNFECHA'
     print(f'def {p[2]}()')
     print(f'Função resultado:\n{p[5]}')  # meter toPython
+    trata_funcao(p)
     return p
 
 def p_Args_Var(p):
     'Args : Var'
-    p[0] = [p[1]]
+    if isinstance(p[1],ListStatic) or isinstance(p[1],ListVar):
+        p[0] = [p[1]]
+    else:
+        p[0] = [p[1]]
     return p
 
 def p_Args_Opern(p):
@@ -281,18 +291,32 @@ def p_VAR_WORD(p):
 
 def p_List_Vazia(p):
     'List : ABREL FECHAL'
-    p[0] = ['[',']']
+    name = f'l{len(p.parser.listasnomes)}'
+    p[0] = name
+    lista = ListStatic([],name)
+    p.parser.listasnomes[name] = lista
+    print(lista.toPythonArgs())
+    print(lista.toPythonRes())
     return p
 
 def p_List_Estatica(p):
     'List : ABREL Conjunto FECHAL' 
-    p[0] = [p[1]] + p[2] + [p[3]]
+    name = f'l{len(p.parser.listasnomes)}'
+    p[0] = name
+    lista = ListStatic(p[2],name)
+    p.parser.listasnomes[name] = lista
+    print(lista.toPythonArgs())
+    print(lista.toPythonRes())
     return p
 
 def p_List(p):
     'List : ABREL WORD NEXT Conjunto2 FECHAL'
-    p[0] = [p[1]] + [p[2],p[3]] + p[4] + [p[5]]
-    p[0] = (...)
+    name = f'l{len(p.parser.listasnomes)}'
+    lista = ListVar(p[2],p[4],name)
+    p[0] = name
+    p.parser.listasnomes[name] = lista
+    print(lista.toPythonArgs())
+    print(lista.toPythonRes())
     return p
 
 def p_Conjunto2_Word(p):
@@ -438,10 +462,15 @@ print(sum_l)
 deff uminho()
     return 1+2;
 end
+
+deff uminho(n,t)
+    return [n:t];
+end
 """
 
 print(f_uminho_())
 '''
 
 parser = yacc.yacc(debug=True)
-parser.parse(inp)
+parser.listasnomes = {}
+parser.parse(inp2)
