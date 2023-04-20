@@ -12,7 +12,7 @@ class Resultado:
             else:
                 flattened.append(item)
         res = ""
-        print("FLATTENED: "+str(flattened))
+        #print("FLATTENED: "+str(flattened)) tirar de comentário para debug
         for elem in flattened:
             m = re.match("-\['(.*)']",elem)
             if m!= None:
