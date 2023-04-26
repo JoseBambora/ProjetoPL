@@ -309,7 +309,7 @@ def p_List_Estatica(p):
     return p
 
 def p_List(p):
-    'List : ABREL WORD NEXT Conjunto2 FECHAL'
+    'List : ABREL Result NEXT Conjunto2 FECHAL'
     name = f'l{len(p.parser.listasnomes)}'
     lista = ListVar(p[2],p[4],name)
     p[0] = name
@@ -317,12 +317,12 @@ def p_List(p):
     return p
 
 def p_Conjunto2_Word(p):
-    'Conjunto2 : WORD'
+    'Conjunto2 : Result'
     p[0] = [p[1]]
     return p
 
 def p_Conjunto2(p):
-    'Conjunto2 : Conjunto2 NEXT WORD'
+    'Conjunto2 : Conjunto2 NEXT Result'
     p[0] = p[1] + [p[2],p[3]]
     return p
 
@@ -355,9 +355,9 @@ deff con2([h:t:t2:t3:t4],n)
     if (n == h)
         if (not (con2(t,n) and con2(t,n)))
             if(true)
-                return [h:t:t2:t3:t4];
+                return [h:t:t2:t3:con2(t4,4)];
             else
-                return false;
+                return [h,t,t2];
         else
             return false;
     else 
