@@ -5,7 +5,7 @@ class Resultado:
     def __init__(self, ret, valorRet, pv):
         self.struct = (ret, valorRet, pv)
 
-    def toPython(self):
+    def toPython(self,numtabs=1):
         flattened = []
         for item in self.struct[1]:
             if isinstance(item, list):
@@ -19,4 +19,5 @@ class Resultado:
             if m!= None:
                 elem = '-'+m.group(1)
             res=res+elem
-        return 'return '+getImut(res)
+        t = '\t'*numtabs
+        return t + 'return '+getImut(res)
