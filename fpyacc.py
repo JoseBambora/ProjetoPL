@@ -92,15 +92,13 @@ def p_Funcao(p):
 
 def p_Args_Var(p):
     'Args : Var'
-    if isinstance(p[1],ListStatic) or isinstance(p[1],ListVar):
-        p[0] = [p[1]]
-    else:
-        p[0] = [p[1]]
+    p[0] = [p[1]]
     return p
 
 def p_Args_Opern(p):
     'Args : Opern NUMBER'
-    p[0] = [p[1]] + [p[2]]
+    p[0] = [p[1],p[2]]
+    return p
  
 def p_Args(p):  # Not working
     '''
