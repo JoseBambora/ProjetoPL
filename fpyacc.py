@@ -8,13 +8,14 @@ from liststructs import ListVar
 from liststructs import ListStatic
 from imutable import getImut
 
+# Python produção código
+# produção nova sinais (muito simular a varoper)
+# argumentos (+|-) NUMBER
 
 def p_Codigo(p):
-    '''Codigo : Codigo CodigoFun Python
+    '''Codigo : Codigo Python
               | Codigo CodigoFun
-              | Python CodigoFun Python
-              | Python CodigoFun
-              | CodigoFun Python
+              | Python
               | CodigoFun'''
     return p
 
@@ -24,8 +25,7 @@ def p_CodigoFun(p):
 
 def p_Python(p):
     '''
-    Python : Python REST 
-           | REST
+    Python : REST
     '''
     if p[1] != None:
         print(f'Código Python {p[1]}')
@@ -99,13 +99,13 @@ def p_Args_Var(p):
     return p
 
 def p_Args_Opern(p):
-    'Args : Opern Var'
+    'Args : Opern NUMBER'
     p[0] = [p[1]] + [p[2]]
  
 def p_Args(p):  # Not working
     '''
     Args : Args VIR Var
-         | Args VIR Opern Var
+         | Args VIR Opern NUMBER
     '''
     p[0] = p[1]
     if len(p) == 4:
@@ -206,7 +206,7 @@ def p_Conds(p):
 def p_Result(p):
     '''
     Result : Varoper
-           | Opern Varoper
+           | Opern Sinais
            | Result Oper Varoper
            | ABREP Result FECHAP
            | Result Oper ABREP Result FECHAP
@@ -339,10 +339,24 @@ def p_Chamadafun(p):
     return p
 
 
+
 def p_error(p):
     print('Erro ' + str(p))
     return p
 
+def p_Sinais(p):
+    '''
+    Sinais : Chamadafun
+           | WORD
+           | NUMBER
+    '''
+    if p[1] != None:
+        p[0] = p[1]
+    if isinstance(p[1],str) and p.parser.listasnomes.__contains__(p[1]):
+        p[0] = str(p.parser.listasnomes[p[1]])
+    elif not isinstance(p[0], list):
+        p[0] = [p[0]]
+    return p
 
 inp2 = '''
 """FPYTHON 
@@ -476,4 +490,4 @@ print(f_uminho_())
 
 parser = yacc.yacc(debug=True)
 parser.listasnomes = {}
-parser.parse(inp2)
+parser.parse(inp)
