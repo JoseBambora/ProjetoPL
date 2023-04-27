@@ -1,7 +1,13 @@
 class Base:
-    def __init__(self, *variaveis):
-        self.struct = (variaveis)
+    def __init__(self, variaveis):
+        self.struct = variaveis
 
     def toPythonBase(self):
-        args = ', '.join(self.struct[0])
-        return f'({args})'
+        args = []
+        for arg in self.struct:
+            if isinstance(arg, list):
+                args.append("".join(arg))
+            else:
+                args.append(arg)
+        return ', '.join(args)
+

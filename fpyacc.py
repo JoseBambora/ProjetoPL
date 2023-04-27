@@ -8,7 +8,8 @@ from liststructs import ListVar
 from liststructs import ListStatic
 from imutable import getImut
 
-# Python produção código
+
+# Python produção de código
 # produção nova sinais (muito simular a varoper)
 # argumentos (+|-) NUMBER
 
@@ -19,9 +20,11 @@ def p_Codigo(p):
               | CodigoFun'''
     return p
 
+
 def p_CodigoFun(p):
     'CodigoFun : ABREFP Fpython FECHAFP'
     return p
+
 
 def p_Python(p):
     '''
@@ -32,6 +35,7 @@ def p_Python(p):
     else:
         print(f'Código Python {p[2]}')
     return p
+
 
 # deff uminho([h:t:t2:t3]):
 #       return 0;
@@ -73,34 +77,40 @@ def p_Fpython(p):
     print('=============================')
     return p
 
+
 def trata_funcao(p):
     p.parser.listasnomes = {}
 
+
 def p_Funcao_Args(p):
-    'Funcao : FUNABRE WORD ABREP Args FECHAP Corpofun FUNFECHA'    
-    print(f'def {p[2]} {p[4]}')
+    'Funcao : FUNABRE WORD ABREP Args FECHAP Corpofun FUNFECHA'
+    print(f'def {p[2]}({Base(p[4]).toPythonBase()}):')
     print(f'Função resultado:\n{p[6].toPython()}')  # meter toPython
     trata_funcao(p)
     return p
 
+
 def p_Funcao(p):
     'Funcao : FUNABRE WORD ABREP FECHAP Corpofun FUNFECHA'
-    print(f'def {p[2]}()')
+    print(f'def {p[2]}():')
     print(f'Função resultado:\n{p[5].toPython()}')  # meter toPython
     trata_funcao(p)
     return p
+
 
 def p_Args_Var(p):
     'Args : Var'
     p[0] = [p[1]]
     return p
 
+
 def p_Args_Opern(p):
     'Args : Opern NUMBER'
-    p[0] = [p[1],p[2]]
+    p[0] = [p[1], p[2]]
     return p
- 
-def p_Args(p):  # Not working
+
+
+def p_Args(p):
     '''
     Args : Args VIR Var
          | Args VIR Opern NUMBER
@@ -110,22 +120,18 @@ def p_Args(p):  # Not working
         p[0] += [p[3]]
     else:
         p[0] += [p[3]] + [p[4]]
-    # if p[1] == '+' or p[1] == '-':      # Opern Var
-    #     p[0] = Base(p[2])
-    # elif p[3] == '+' or p[3] == '-':    # Args VIR Opern Var
-    #     p[0] = Base(p[1], p[4])
-    # else:                               # Var e Args VIR Var
-    #     p[0] = Base(p[1], p[3])
     return p
+
 
 def p_Conjunto(p):
     'Conjunto : Conjunto VIR Result'
-    if(not isinstance(p[3],list)):
+    if (not isinstance(p[3], list)):
         p[3] = [p[3]]
     p[0] = p[1] + [p[2]] + p[3]
     if len(p) == 5:
         p[0] += p[4]
     return p
+
 
 def p_Conjunto_Result(p):
     'Conjunto : Result'
@@ -146,33 +152,39 @@ def p_Corpofun_IF(p):
     p[0] = Condicoes(p[3], p[5], p[7])
     return p
 
+
 def p_Cond_CondSimple(p):
     'Cond : CondSimple'
     p[0] = p[1]
     return p
+
 
 def p_Cond_CONDAND(p):
     'Cond : Cond CONDAND CondSimple'
     p[0] = p[1] + ['and'] + p[3]
     return p
 
+
 def p_Cond_CONDOR(p):
     'Cond : Cond CONDOR CondSimple'
     p[0] = p[1] + ['or'] + p[3]
     return p
 
+
 def p_CondSimple_ABREP(p):
     'CondSimple : ABREP Cond FECHAP'
-    p[2].insert(0,p[1])
+    p[2].insert(0, p[1])
     p[2].append(p[3])
     p[0] = p[2]
     return p
 
+
 def p_Cond_NOT(p):
     'Cond : NOT CondSimple'
-    p[2].insert(0,p[1])
+    p[2].insert(0, p[1])
     p[0] = p[2]
     return p
+
 
 def p_CondSimple(p):
     '''
@@ -209,17 +221,17 @@ def p_Result(p):
            | ABREP Result FECHAP
            | Result Oper ABREP Result FECHAP
     '''
-    if(len(p) == 6):
-        p[0] = p[1] + [p[2]] + [p[3]]+ [p[4]] + [p[5]]
+    if (len(p) == 6):
+        p[0] = p[1] + [p[2]] + [p[3]] + [p[4]] + [p[5]]
     elif (len(p) == 4):
-        if (p[2] in ['+','-','*','/','$','and','or','<','>','=','!=','>=','<=','in']):
+        if (p[2] in ['+', '-', '*', '/', '$', 'and', 'or', '<', '>', '=', '!=', '>=', '<=', 'in']):
             p[0] = p[1] + [p[2]] + [p[3]]
-        elif(isinstance(p[2],list)):
-            p[0] = p[1] + str(p[2]) +p[3]
+        elif (isinstance(p[2], list)):
+            p[0] = p[1] + str(p[2]) + p[3]
         else:
             p[0] = p[1] + p[2] + p[3]
     elif (len(p) == 3):
-        if(isinstance(p[2],list)):
+        if (isinstance(p[2], list)):
             p[0] = p[1] + str(p[2])
         else:
             p[0] = p[1] + p[2]
@@ -238,6 +250,7 @@ def p_Opern(p):
     p[0] = p[1]
     return p
 
+
 def p_Oper(p):
     '''
     Oper : Opern
@@ -253,6 +266,7 @@ def p_Oper(p):
     p[0] = p[1]
     return p
 
+
 def p_Varoper(p):
     '''
     Varoper : Chamadafun
@@ -260,11 +274,12 @@ def p_Varoper(p):
     '''
     if p[1] != None:
         p[0] = p[1]
-    if isinstance(p[1],str) and p.parser.listasnomes.__contains__(p[1]):
+    if isinstance(p[1], str) and p.parser.listasnomes.__contains__(p[1]):
         p[0] = str(p.parser.listasnomes[p[1]])
     elif not isinstance(p[0], list):
         p[0] = [p[0]]
     return p
+
 
 def p_Var_NUMBER(p):
     'Var : NUMBER'
@@ -272,11 +287,13 @@ def p_Var_NUMBER(p):
     p[0] = p[1]
     return p
 
+
 def p_Var_BOOL(p):
     'Var : BOOL'
     print(f'Booleano: {p[1]}')
     p[0] = p[1].capitalize()
     return p
+
 
 def p_Var_List(p):
     'Var : List'
@@ -284,63 +301,71 @@ def p_Var_List(p):
     p[0] = p[1]
     return p
 
+
 def p_VAR_WORD(p):
     'Var : WORD'
     print(f'Variável: {p[1]}')
     p[0] = p[1]
     return p
 
+
 def p_List_Vazia(p):
     'List : ABREL FECHAL'
     name = f'l{len(p.parser.listasnomes)}'
     p[0] = name
-    lista = ListStatic([],name)
+    lista = ListStatic([], name)
     p.parser.listasnomes[name] = lista
     return p
 
+
 def p_List_Estatica(p):
-    'List : ABREL Conjunto FECHAL' 
+    'List : ABREL Conjunto FECHAL'
     name = f'l{len(p.parser.listasnomes)}'
     p[0] = name
-    lista = ListStatic(p[2],name)
+    lista = ListStatic(p[2], name)
     p.parser.listasnomes[name] = lista
     return p
+
 
 def p_List(p):
     'List : ABREL Result NEXT Conjunto2 FECHAL'
     name = f'l{len(p.parser.listasnomes)}'
-    lista = ListVar(p[2],p[4],name)
+    lista = ListVar(p[2], p[4], name)
     p[0] = name
     p.parser.listasnomes[name] = lista
     return p
+
 
 def p_Conjunto2_Word(p):
     'Conjunto2 : Result'
     p[0] = [p[1]]
     return p
 
+
 def p_Conjunto2(p):
     'Conjunto2 : Conjunto2 NEXT Result'
-    p[0] = p[1] + [p[2],p[3]]
+    p[0] = p[1] + [p[2], p[3]]
     return p
 
+
 def p_Chamadafun_NoArgs(p):
-    'Chamadafun : WORD ABREP FECHAP'   
-    p[0] = [p[1],p[2],p[3]]
-    return p 
+    'Chamadafun : WORD ABREP FECHAP'
+    p[0] = [p[1], p[2], p[3]]
+    return p
+
 
 def p_Chamadafun(p):
     'Chamadafun : WORD ABREP Conjunto FECHAP'
-    for e in range(0,len(p[3]),2):
+    for e in range(0, len(p[3]), 2):
         p[3][e] = getImut(p[3][e])
     p[0] = [p[1], p[2]] + p[3] + [p[4]]
     return p
 
 
-
 def p_error(p):
     print('Erro ' + str(p))
     return p
+
 
 def p_Sinais(p):
     '''
@@ -350,16 +375,17 @@ def p_Sinais(p):
     '''
     if p[1] != None:
         p[0] = p[1]
-    if isinstance(p[1],str) and p.parser.listasnomes.__contains__(p[1]):
+    if isinstance(p[1], str) and p.parser.listasnomes.__contains__(p[1]):
         p[0] = str(p.parser.listasnomes[p[1]])
     elif not isinstance(p[0], list):
         p[0] = [p[0]]
     return p
 
+
 inp2 = '''
 """FPYTHON 
 
-deff con2([h:t:t2:t3:t4],n)
+deff con2(h+k)
     return seila(t) + seila(t2) + seila(t3);
 end
 
@@ -488,4 +514,4 @@ print(f_uminho_())
 
 parser = yacc.yacc(debug=True)
 parser.listasnomes = {}
-parser.parse(inp)
+parser.parse(inp2)
