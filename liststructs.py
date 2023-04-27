@@ -27,7 +27,8 @@ class ListVar:
         res = []
         t = '\t' * numtabs
         for e in range(0, len(self.l) - 1):
-            res.append(f'{t}{self.l[e]} = {self.letter}[{e}]')
+            if not exp.match(self.l[e]):
+                res.append(f'{t}{self.l[e]} = {self.letter}[{e}]')
         res.append(f'{t}{self.l[-1]} = {self.letter}[{e + 1}:]')
         # res = Base(res).toPythonBase()
         # res.reverse()
@@ -52,7 +53,6 @@ class ListVar:
 
 class ListStatic:
     def __init__(self, elems, letter):
-        print(elems)
         self.l = list(filter(lambda s: s != ',', elems))
         self.letter = letter
 
@@ -60,7 +60,7 @@ class ListStatic:
         res = []
         t = '\t' * numtabs
         for e in range(0, len(self.l)):
-            if not self.l[e].isnumeric():
+            if not exp.match(self.l[e]):
                 res.append(f'{t}{self.l[e]} = {self.letter}[{e}]')
         return '\n'.join(res)
 
@@ -73,7 +73,6 @@ class ListStatic:
         res = []
         res.append(f'len({self.letter}) == {len(self.l)-1}')
         index = 0
-        print(self.l)
         for elem in self.l:
             if not isinstance(elem,str):
                 if isinstance(elem,ListVar) or isinstance(elem, ListStatic):
