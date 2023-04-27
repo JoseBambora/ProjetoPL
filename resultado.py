@@ -11,7 +11,7 @@ class Resultado:
         flattened = []
         for item in self.struct[1]:
             if isinstance(item, list):
-                flattened.extend(Resultado(None, item, None).toPython())
+                flattened.extend(Resultado(None, item, None).toPython(0)[7:])
             else:
                 flattened.append(item)
         res = ""

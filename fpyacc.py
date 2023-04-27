@@ -84,6 +84,7 @@ def trata_funcao(p):
 
 def p_Funcao_Args(p):
     'Funcao : FUNABRE WORD ABREP Args FECHAP Corpofun FUNFECHA'
+    print(p[4])
     print(f'def {p[2]}({Base(p[4]).toPythonBase()}):')
     print(f'Função resultado:\n{p[6].toPython()}')  # meter toPython
     trata_funcao(p)
@@ -97,31 +98,16 @@ def p_Funcao(p):
     trata_funcao(p)
     return p
 
-
 def p_Args_Var(p):
-    'Args : Var'
+    'Args : VarArgs'
     p[0] = [p[1]]
     return p
 
-
-def p_Args_Opern(p):
-    'Args : Opern NUMBER'
-    p[0] = [p[1], p[2]]
-    return p
-
-
 def p_Args(p):
-    '''
-    Args : Args VIR Var
-         | Args VIR Opern NUMBER
-    '''
+    'Args : Args VIR VarArgs'
     p[0] = p[1]
-    if len(p) == 4:
-        p[0] += [p[3]]
-    else:
-        p[0] += [p[3]] + [p[4]]
+    p[0] += [p[3]]
     return p
-
 
 def p_Conjunto(p):
     'Conjunto : Conjunto VIR Result'
@@ -142,6 +128,7 @@ def p_Conjunto_Result(p):
 def p_Corpofun_RETURN(p):
     'Corpofun : RETURN Result PV'
     # print(f'Funcao {p[1]} {p[2]} {p[3]}')
+    print(p[2])
     p[0] = Resultado(p[1], p[2], p[3])
     return p
 
@@ -170,6 +157,11 @@ def p_Cond_CONDOR(p):
     p[0] = p[1] + ['or'] + p[3]
     return p
 
+def p_Cond_NOT(p):
+    'Cond : NOT CondSimple'
+    p[2].insert(0, p[1])
+    p[0] = p[2]
+    return p
 
 def p_CondSimple_ABREP(p):
     'CondSimple : ABREP Cond FECHAP'
@@ -179,16 +171,12 @@ def p_CondSimple_ABREP(p):
     return p
 
 
-def p_Cond_NOT(p):
-    'Cond : NOT CondSimple'
-    p[2].insert(0, p[1])
-    p[0] = p[2]
-    return p
-
-
 def p_CondSimple(p):
     '''
-    CondSimple : Varoper Conds Varoper
+    CondSimple : ABREP Cond FECHAP Conds Varoper
+               | Varoper Conds ABREP Cond FECHAP
+               | ABREP Cond FECHAP Conds ABREP Cond FECHAP
+               | Varoper Conds Varoper
                | Varoper
     '''
     if (len(p) > 2):
@@ -381,11 +369,64 @@ def p_Sinais(p):
         p[0] = [p[0]]
     return p
 
+def p_VarArgs(p):
+    '''
+    VarArgs : NUMBER
+            | Opern NUMBER
+            | BOOL
+            | ListArg
+            | WORD
+    '''
+    if(len(p) == 2):
+        p[0] = p[1]
+    else:
+        p[0] = [p[1],p[2]]
+    return p
+
+def p_ListArg(p):
+    '''
+    ListArg : ABREL FECHAL
+            | ABREL ConjuntoListaArgs FECHAL
+            | ABREL VarArgs NEXT Conjunto2ListaArgs FECHAL
+    '''
+    name = f'l{len(p.parser.listasnomes)}'
+    if len(p) == 3:
+        lista = ListStatic([],name)
+    elif len(p) == 4:
+        lista = ListStatic(p[2],name)
+    else:
+        lista = ListVar(p[2], p[4], name)
+    p[0] = name
+    p.parser.listasnomes[name] = lista
+    return p
+
+def p_ConjuntoListaArgs_Single(p):
+    'ConjuntoListaArgs : VarArgs'
+    p[0] = [p[1]]
+    return p
+    
+
+def p_ConjuntoListaArgs(p):
+    'ConjuntoListaArgs : ConjuntoListaArgs VIR VarArgs'
+    p[0] = p[1] + [p[2]]
+    return p
+
+
+def p_Conjunto2ListaArgs_Single(p):
+    'Conjunto2ListaArgs : VarArgs'
+    p[0] = [p[1]]
+    return p
+    
+
+def p_Conjunto2ListaArgs(p):
+    'Conjunto2ListaArgs : Conjunto2ListaArgs NEXT VarArgs'
+    p[0] = p[1] + [p[2]]
+    return p
 
 inp2 = '''
 """FPYTHON 
 
-deff con2(h+k)
+deff con2(h,k)
     return seila(t) + seila(t2) + seila(t3);
 end
 
