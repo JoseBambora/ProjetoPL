@@ -1,12 +1,27 @@
 from imutable import getImut
 from resultado import Resultado
 from base import Base
+import re
 
+exp = re.compile(r'((\+|\-)?\d+(\.\d+)?|True|False)')
 
 class ListVar:
     def __init__(self, elem, rest, letter):
         self.l = [elem] + list(filter(lambda s: s != ':', rest))
         self.letter = letter
+
+    def toPythonIf(self):
+        res = []
+        res.append(f'len({self.letter}) >= {len(self.l)-1}')
+        index = 0
+        for elem in self.l:
+            if not isinstance(elem,str):
+                if isinstance(elem,ListVar) or isinstance(elem,ListStatic):
+                    res.append(f'({elem.toPythonIf()})')
+            elif exp.match(elem):
+                res.append(f'{self.letter}[{index}] == {elem}')
+
+        return ' and '.join(res)
 
     def toPythonArgs(self, numtabs=1):
         res = []
@@ -14,7 +29,9 @@ class ListVar:
         for e in range(0, len(self.l) - 1):
             res.append(f'{t}{self.l[e]} = {self.letter}[{e}]')
         res.append(f'{t}{self.l[-1]} = {self.letter}[{e + 1}:]')
-        res = Base(res).toPythonBase()
+        # res = Base(res).toPythonBase()
+        # res.reverse()
+        res = '\n'.join(res)
         return res
 
     def toPythonRes(self):
@@ -35,6 +52,7 @@ class ListVar:
 
 class ListStatic:
     def __init__(self, elems, letter):
+        print(elems)
         self.l = list(filter(lambda s: s != ',', elems))
         self.letter = letter
 
@@ -42,13 +60,27 @@ class ListStatic:
         res = []
         t = '\t' * numtabs
         for e in range(0, len(self.l)):
-            res.append(f'{t}{self.l[e]} = {self.letter}[{e}]')
+            if not self.l[e].isnumeric():
+                res.append(f'{t}{self.l[e]} = {self.letter}[{e}]')
         return '\n'.join(res)
 
     def toPythonRes(self):
         aux = list(map(lambda l: Resultado(None, l, None).toPython(0)[7:], self.l))
         content = ','.join(aux)
         return f'[{content}]'
+    
+    def toPythonIf(self):
+        res = []
+        res.append(f'len({self.letter}) == {len(self.l)-1}')
+        index = 0
+        print(self.l)
+        for elem in self.l:
+            if not isinstance(elem,str):
+                if isinstance(elem,ListVar) or isinstance(elem, ListStatic):
+                    res.append(f'({elem.toPythonIf()})')
+            elif exp.match(elem):
+                res.append(f'{self.letter}[{index}] == {elem}')
+        return ' and '.join(res)
 
     def getName(self):
         return self.letter

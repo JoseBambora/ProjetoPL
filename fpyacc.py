@@ -311,6 +311,7 @@ def p_List_Estatica(p):
     name = f'l{len(p.parser.listasnomes)}'
     p[0] = name
     lista = ListStatic(p[2], name)
+    print(lista.toPythonArgs())
     p.parser.listasnomes[name] = lista
     return p
 
@@ -321,6 +322,8 @@ def p_List(p):
     lista = ListVar(p[2], p[4], name)
     p[0] = name
     p.parser.listasnomes[name] = lista
+    print(lista.toPythonArgs())
+    print(lista.toPythonIf())
     return p
 
 
@@ -368,12 +371,15 @@ def p_Sinais(p):
     elif not isinstance(p[0], list):
         p[0] = [p[0]]
     return p
+def p_VarArgs_BOOL(p):
+    'VarArgs : BOOL'
+    p[0] = p[1].capitalize()
+    return p
 
 def p_VarArgs(p):
     '''
     VarArgs : NUMBER
             | Opern NUMBER
-            | BOOL
             | ListArg
             | WORD
     '''
@@ -396,6 +402,8 @@ def p_ListArg(p):
         lista = ListStatic(p[2],name)
     else:
         lista = ListVar(p[2], p[4], name)
+    print(lista.toPythonArgs())
+    print(lista.toPythonIf())
     p[0] = name
     p.parser.listasnomes[name] = lista
     return p
@@ -408,7 +416,7 @@ def p_ConjuntoListaArgs_Single(p):
 
 def p_ConjuntoListaArgs(p):
     'ConjuntoListaArgs : ConjuntoListaArgs VIR VarArgs'
-    p[0] = p[1] + [p[2]]
+    p[0] = p[1] + [p[3]]
     return p
 
 
@@ -447,7 +455,8 @@ deff con2([h:t:t2:t3:t4],n)
                 return false;
         else
             return false;
-end"""
+end
+"""
 '''
 
 inp = '''
@@ -553,6 +562,22 @@ end
 print(f_uminho_())
 '''
 
+inp3 = '''
+"""FPYTHON
+
+deff con2([1,2,3,4,false],k)
+    return 0;
+end
+
+deff con2([[2:t]:t2],k)
+   return 0;
+end
+
+"""
+'''
+# deff con2([[h:t]:t2],k)
+#    return 0;
+# end
 parser = yacc.yacc(debug=True)
 parser.listasnomes = {}
-parser.parse(inp2)
+parser.parse(inp3)
