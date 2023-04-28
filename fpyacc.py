@@ -238,7 +238,7 @@ def p_Result(p):
             p[0] = p[1] + p[2] + p[3]
     elif (len(p) == 3):
         if (isinstance(p[2], list)):
-            p[0] = [p[1]+'('+''.join(p[2])+')']
+            p[0] = [p[1]+''.join(p[2])]
         else:
             p[0] = p[1] + p[2]
     else:
