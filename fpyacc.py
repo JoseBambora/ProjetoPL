@@ -219,11 +219,29 @@ def p_Conds(p):
     p[0] = p[1]
     return p
 
+
+def p_Result_OpernVareper(p):
+    'Result : Opern Varoper'
+    if (isinstance(p[2], list)):
+        p[2] = transforma(p[2])
+        p[0] = [p[1]+''.join(p[2])]
+    else:
+        p[0] = p[1] + p[2]
+    return p
+
+def p_Result_OpernRes(p):
+    'Result : Opern ABREP Result FECHAP'
+    if (isinstance(p[3], list)):
+        p[3] = transforma(p[3])
+        p[0] = [p[1] + p[2] + ''.join(p[3]) + p[4]]
+    else:
+        p[0] = p[1] + p[2] + p[3] + p[4]
+    return p
+
 # 3*1*([h:t])+43
 def p_Result(p):
     '''
     Result : Varoper
-           | Opern Result
            | Result Oper Varoper
            | ABREP Result FECHAP
            | Result Oper ABREP Result FECHAP
@@ -584,7 +602,7 @@ deff con3([[h1:2:h2:3:t]:t2],k)
         else
             return False;
     else 
-        return seila(1,3*1*(-(40*50*len([h1:t])))+43-([h:t]),2,kkk(1,2,3));
+        return seila(3*(-(1)),1,3*1*(-(40*50*len([h1:t])))+43-([h:t]),2,kkk(1,2,3));
 end
 
 """
