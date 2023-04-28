@@ -16,6 +16,7 @@ def transforma(lista):
         if isinstance(e,ListVar) or isinstance(e,ListStatic):
             lista[index] = e.toPythonRes()
         elif isinstance(e,list):
+            e = transforma(e)
             lista[index] = ''.join(e)
         index +=1
     return lista
@@ -218,11 +219,11 @@ def p_Conds(p):
     p[0] = p[1]
     return p
 
-
+# 3*1*([h:t])+43
 def p_Result(p):
     '''
     Result : Varoper
-           | Opern Sinais
+           | Opern Result
            | Result Oper Varoper
            | ABREP Result FECHAP
            | Result Oper ABREP Result FECHAP
@@ -233,11 +234,13 @@ def p_Result(p):
         if (p[2] in ['+', '-', '*', '/', '$', 'and', 'or', '<', '>', '=', '!=', '>=', '<=', 'in']):
             p[0] = p[1] + [p[2]] + p[3]
         elif (isinstance(p[2], list)):
-            p[0] = p[1] + str(p[2]) + p[3]
+            p[2] = transforma(p[2])
+            p[0] = p[1] + ''.join(p[2]) + p[3]
         else:
             p[0] = p[1] + p[2] + p[3]
     elif (len(p) == 3):
         if (isinstance(p[2], list)):
+            p[2] = transforma(p[2])
             p[0] = [p[1]+''.join(p[2])]
         else:
             p[0] = p[1] + p[2]
@@ -372,18 +375,6 @@ def p_error(p):
     print('Erro ' + str(p))
     return p
 
-
-def p_Sinais(p):
-    '''
-    Sinais : Chamadafun
-           | WORD
-           | NUMBER
-    '''
-    if p[1] != None:
-        p[0] = p[1]
-    if not isinstance(p[0], list):
-        p[0] = [p[0]]
-    return p
 def p_VarArgs_BOOL(p):
     'VarArgs : BOOL'
     p[0] = p[1].capitalize()
@@ -593,7 +584,7 @@ deff con3([[h1:2:h2:3:t]:t2],k)
         else
             return False;
     else 
-        return seila(1,3*1*(-40)+43,2,kkk(1,2,3));
+        return seila(1,3*1*(-(40*50*len([h1:t])))+43-([h:t]),2,kkk(1,2,3));
 end
 
 """
