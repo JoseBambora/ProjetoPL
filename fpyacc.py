@@ -7,6 +7,9 @@ from resultado import Resultado
 from liststructs import ListVar
 from liststructs import ListStatic
 from imutable import getImut
+import re
+
+exp = re.compile(r'((\+|\-)?\d+(\.\d+)?|True|False)')
 
 
 # Python produção de código
@@ -128,7 +131,6 @@ def p_Conjunto_Result(p):
 def p_Corpofun_RETURN(p):
     'Corpofun : RETURN Result PV'
     # print(f'Funcao {p[1]} {p[2]} {p[3]}')
-    print(p[2])
     p[0] = Resultado(p[1], p[2], p[3])
     return p
 
@@ -300,8 +302,8 @@ def p_VAR_WORD(p):
 def p_List_Vazia(p):
     'List : ABREL FECHAL'
     name = f'l{len(p.parser.listasnomes)}'
-    p[0] = name
     lista = ListStatic([], name)
+    p[0] = lista
     p.parser.listasnomes[name] = lista
     return p
 
@@ -309,9 +311,8 @@ def p_List_Vazia(p):
 def p_List_Estatica(p):
     'List : ABREL Conjunto FECHAL'
     name = f'l{len(p.parser.listasnomes)}'
-    p[0] = name
     lista = ListStatic(p[2], name)
-    print(lista.toPythonArgs())
+    p[0] = lista
     p.parser.listasnomes[name] = lista
     return p
 
@@ -320,10 +321,8 @@ def p_List(p):
     'List : ABREL Result NEXT Conjunto2 FECHAL'
     name = f'l{len(p.parser.listasnomes)}'
     lista = ListVar(p[2], p[4], name)
-    p[0] = name
+    p[0] = lista
     p.parser.listasnomes[name] = lista
-    print(lista.toPythonArgs())
-    print(lista.toPythonIf())
     return p
 
 
@@ -402,9 +401,7 @@ def p_ListArg(p):
         lista = ListStatic(p[2],name)
     else:
         lista = ListVar(p[2], p[4], name)
-    print(lista.toPythonArgs())
-    print(lista.toPythonIf())
-    p[0] = name
+    p[0] = lista
     p.parser.listasnomes[name] = lista
     return p
 
@@ -573,6 +570,17 @@ deff con2([[2:t]:t2],k)
    return 0;
 end
 
+
+deff con3([[2:t]:t2],k)
+    if ((k in t) and (k in t2))
+        if (k != 2)
+            return con2([[2:3:t]:t2],k,3);
+        else
+            return False;
+    else 
+        return False;
+end
+
 """
 '''
 # deff con2([[h:t]:t2],k)
@@ -580,4 +588,4 @@ end
 # end
 parser = yacc.yacc(debug=True)
 parser.listasnomes = {}
-parser.parse(inp3)
+parser.parse(inp)

@@ -1,7 +1,29 @@
-from imutable import getImut
 from resultado import Resultado
-from base import Base
 import re
+
+def getArgs(numtabs,self):
+    res = []
+    t = numtabs * '\t'
+    for e in range(0, len(self.l) - 1):
+        elem = self.l[e]
+        if not isinstance(elem,str):
+            if isinstance(elem,ListVar) or isinstance(elem,ListStatic):
+                res.append(f'{t}{elem.letter} = {self.letter}[{e}]')
+                res.append(elem.toPythonArgs())
+        elif not exp.match(elem):
+            res.append(f'{t}{elem} = {self.letter}[{e}]')    
+    return res
+
+def getIf(self):
+    res = []
+    index = 0
+    for elem in self.l:
+        if not isinstance(elem,str):
+            if isinstance(elem,ListVar) or isinstance(elem,ListStatic):
+                res.append(f'({elem.toPythonIf()})')
+        elif exp.match(elem):
+            res.append(f'{self.letter}[{index}] == {elem}')
+    return res
 
 exp = re.compile(r'((\+|\-)?\d+(\.\d+)?|True|False)')
 
@@ -13,23 +35,13 @@ class ListVar:
     def toPythonIf(self):
         res = []
         res.append(f'len({self.letter}) >= {len(self.l)-1}')
-        index = 0
-        for elem in self.l:
-            if not isinstance(elem,str):
-                if isinstance(elem,ListVar) or isinstance(elem,ListStatic):
-                    res.append(f'({elem.toPythonIf()})')
-            elif exp.match(elem):
-                res.append(f'{self.letter}[{index}] == {elem}')
-
+        res.extend(getIf(self))
         return ' and '.join(res)
 
-    def toPythonArgs(self, numtabs=1):
-        res = []
+    def toPythonArgs(self, numtabs=2):
         t = '\t' * numtabs
-        for e in range(0, len(self.l) - 1):
-            if not exp.match(self.l[e]):
-                res.append(f'{t}{self.l[e]} = {self.letter}[{e}]')
-        res.append(f'{t}{self.l[-1]} = {self.letter}[{e + 1}:]')
+        res = getArgs(numtabs,self)
+        res.append(f'{t}{self.l[-1]} = {self.letter}[{len(self.l)}:]')
         # res = Base(res).toPythonBase()
         # res.reverse()
         res = '\n'.join(res)
@@ -56,12 +68,8 @@ class ListStatic:
         self.l = list(filter(lambda s: s != ',', elems))
         self.letter = letter
 
-    def toPythonArgs(self, numtabs=1):
-        res = []
-        t = '\t' * numtabs
-        for e in range(0, len(self.l)):
-            if not exp.match(self.l[e]):
-                res.append(f'{t}{self.l[e]} = {self.letter}[{e}]')
+    def toPythonArgs(self, numtabs=2):
+        res = getArgs(numtabs,self)
         return '\n'.join(res)
 
     def toPythonRes(self):
@@ -72,13 +80,7 @@ class ListStatic:
     def toPythonIf(self):
         res = []
         res.append(f'len({self.letter}) == {len(self.l)-1}')
-        index = 0
-        for elem in self.l:
-            if not isinstance(elem,str):
-                if isinstance(elem,ListVar) or isinstance(elem, ListStatic):
-                    res.append(f'({elem.toPythonIf()})')
-            elif exp.match(elem):
-                res.append(f'{self.letter}[{index}] == {elem}')
+        res.extend(getIf(self))
         return ' and '.join(res)
 
     def getName(self):

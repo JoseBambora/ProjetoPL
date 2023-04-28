@@ -1,3 +1,6 @@
+from liststructs import ListStatic
+from liststructs import ListVar
+
 class Base:
     def __init__(self, variaveis):
         self.struct = variaveis
@@ -7,6 +10,8 @@ class Base:
         for arg in self.struct:
             if isinstance(arg, list):
                 args.append("".join(arg))
+            elif isinstance(arg, ListVar) or isinstance(arg, ListStatic):
+                args.append(arg.getName())
             else:
                 args.append(arg)
         return ', '.join(args)
