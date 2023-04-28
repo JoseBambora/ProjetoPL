@@ -7,6 +7,7 @@ from resultado import Resultado
 from liststructs import ListVar
 from liststructs import ListStatic
 from imutable import getImut
+from imutable import getNameList
 import re
 
 exp = re.compile(r'((\+|\-)?\d+(\.\d+)?|True|False)')
@@ -33,10 +34,10 @@ def p_Python(p):
     '''
     Python : REST
     '''
-    if p[1] != None:
-        print(f'Código Python {p[1]}')
-    else:
-        print(f'Código Python {p[2]}')
+    # if p[1] != None:
+    #     print(f'Código Python {p[1]}')
+    # else:
+    #     print(f'Código Python {p[2]}')
     return p
 
 
@@ -82,13 +83,15 @@ def p_Fpython(p):
 
 
 def trata_funcao(p):
-    p.parser.listasnomes = {}
+    # p.parser.listasnomes = {}
+    p.parser.nomeslistas = 0
 
 
 def p_Funcao_Args(p):
     'Funcao : FUNABRE WORD ABREP Args FECHAP Corpofun FUNFECHA'
-    print(p[4])
     print(f'def {p[2]}({Base(p[4]).toPythonBase()}):')
+    print(f'Meter ifs para pattern matching')
+    print(f'Invocar função toPythonArgs das listas caso temos listas')
     print(f'Função resultado:\n{p[6].toPython()}')  # meter toPython
     trata_funcao(p)
     return p
@@ -97,6 +100,8 @@ def p_Funcao_Args(p):
 def p_Funcao(p):
     'Funcao : FUNABRE WORD ABREP FECHAP Corpofun FUNFECHA'
     print(f'def {p[2]}():')
+    print(f'Meter ifs para pattern matching')
+    print(f'Invocar função toPythonArgs das listas caso temos listas')
     print(f'Função resultado:\n{p[5].toPython()}')  # meter toPython
     trata_funcao(p)
     return p
@@ -227,7 +232,7 @@ def p_Result(p):
             p[0] = p[1] + p[2]
     else:
         p[0] = p[1]
-    print(p[0])
+    # print(p[0])
     return p
 
 
@@ -236,7 +241,7 @@ def p_Opern(p):
     Opern : ADD
           | MINUS
     '''
-    print(p[1])
+    # print(p[1])
     p[0] = p[1]
     return p
 
@@ -251,8 +256,7 @@ def p_Oper(p):
          | AND
          | Conds
     '''
-    if p[1] != None:
-        print(f'Operacao {p[1]}')
+    # print(f'Operacao {p[1]}')
     p[0] = p[1]
     return p
 
@@ -264,65 +268,66 @@ def p_Varoper(p):
     '''
     if p[1] != None:
         p[0] = p[1]
-    if isinstance(p[1], str) and p.parser.listasnomes.__contains__(p[1]):
-        p[0] = str(p.parser.listasnomes[p[1]])
-    elif not isinstance(p[0], list):
+    if not isinstance(p[0], list):
         p[0] = [p[0]]
     return p
 
 
 def p_Var_NUMBER(p):
     'Var : NUMBER'
-    print(f'Número {p[1]}')
+    # print(f'Número {p[1]}')
     p[0] = p[1]
     return p
 
 
 def p_Var_BOOL(p):
     'Var : BOOL'
-    print(f'Booleano: {p[1]}')
+    # print(f'Booleano: {p[1]}')
     p[0] = p[1].capitalize()
     return p
 
 
 def p_Var_List(p):
     'Var : List'
-    print(f'Lista')
+    # print(f'Lista')
     p[0] = p[1]
     return p
 
 
 def p_VAR_WORD(p):
     'Var : WORD'
-    print(f'Variável: {p[1]}')
+    # print(f'Variável: {p[1]}')
     p[0] = p[1]
     return p
 
 
 def p_List_Vazia(p):
     'List : ABREL FECHAL'
-    name = f'l{len(p.parser.listasnomes)}'
+    name = getNameList(p.parser.nomeslistas)
     lista = ListStatic([], name)
     p[0] = lista
-    p.parser.listasnomes[name] = lista
+    p.parser.nomeslistas +=1
+    # p.parser.listasnomes[name] = lista
     return p
 
 
 def p_List_Estatica(p):
     'List : ABREL Conjunto FECHAL'
-    name = f'l{len(p.parser.listasnomes)}'
+    name = getNameList(p.parser.nomeslistas)
     lista = ListStatic(p[2], name)
     p[0] = lista
-    p.parser.listasnomes[name] = lista
+    p.parser.nomeslistas +=1
+    # p.parser.listasnomes[name] = lista
     return p
 
 
 def p_List(p):
     'List : ABREL Result NEXT Conjunto2 FECHAL'
-    name = f'l{len(p.parser.listasnomes)}'
+    name = getNameList(p.parser.nomeslistas)
     lista = ListVar(p[2], p[4], name)
     p[0] = lista
-    p.parser.listasnomes[name] = lista
+    p.parser.nomeslistas +=1
+    # p.parser.listasnomes[name] = lista
     return p
 
 
@@ -365,9 +370,7 @@ def p_Sinais(p):
     '''
     if p[1] != None:
         p[0] = p[1]
-    if isinstance(p[1], str) and p.parser.listasnomes.__contains__(p[1]):
-        p[0] = str(p.parser.listasnomes[p[1]])
-    elif not isinstance(p[0], list):
+    if not isinstance(p[0], list):
         p[0] = [p[0]]
     return p
 def p_VarArgs_BOOL(p):
@@ -394,7 +397,7 @@ def p_ListArg(p):
             | ABREL ConjuntoListaArgs FECHAL
             | ABREL VarArgs NEXT Conjunto2ListaArgs FECHAL
     '''
-    name = f'l{len(p.parser.listasnomes)}'
+    name = getNameList(p.parser.nomeslistas)
     if len(p) == 3:
         lista = ListStatic([],name)
     elif len(p) == 4:
@@ -402,7 +405,8 @@ def p_ListArg(p):
     else:
         lista = ListVar(p[2], p[4], name)
     p[0] = lista
-    p.parser.listasnomes[name] = lista
+    p.parser.nomeslistas += 1
+    # p.parser.listasnomes[name] = lista
     return p
 
 def p_ConjuntoListaArgs_Single(p):
@@ -425,7 +429,7 @@ def p_Conjunto2ListaArgs_Single(p):
 
 def p_Conjunto2ListaArgs(p):
     'Conjunto2ListaArgs : Conjunto2ListaArgs NEXT VarArgs'
-    p[0] = p[1] + [p[2]]
+    p[0] = p[1] + [p[3]]
     return p
 
 inp2 = '''
@@ -571,7 +575,7 @@ deff con2([[2:t]:t2],k)
 end
 
 
-deff con3([[2:t]:t2],k)
+deff con3([[h1:2:h2:3:t]:t2],k)
     if ((k in t) and (k in t2))
         if (k != 2)
             return con2([[2:3:t]:t2],k,3);
@@ -587,5 +591,6 @@ end
 #    return 0;
 # end
 parser = yacc.yacc(debug=True)
-parser.listasnomes = {}
+# parser.listasnomes = {}
+parser.nomeslistas = 0
 parser.parse(inp)

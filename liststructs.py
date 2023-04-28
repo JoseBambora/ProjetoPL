@@ -23,6 +23,7 @@ def getIf(self):
                 res.append(f'({elem.toPythonIf()})')
         elif exp.match(elem):
             res.append(f'{self.letter}[{index}] == {elem}')
+        index +=1 
     return res
 
 exp = re.compile(r'((\+|\-)?\d+(\.\d+)?|True|False)')
@@ -41,7 +42,7 @@ class ListVar:
     def toPythonArgs(self, numtabs=2):
         t = '\t' * numtabs
         res = getArgs(numtabs,self)
-        res.append(f'{t}{self.l[-1]} = {self.letter}[{len(self.l)}:]')
+        res.append(f'{t}{self.l[-1]} = {self.letter}[{len(self.l)-1}:]')
         # res = Base(res).toPythonBase()
         # res.reverse()
         res = '\n'.join(res)

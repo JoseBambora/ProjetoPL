@@ -11,6 +11,8 @@ class Base:
             if isinstance(arg, list):
                 args.append("".join(arg))
             elif isinstance(arg, ListVar) or isinstance(arg, ListStatic):
+                # print(arg.toPythonArgs())
+                # print(arg.toPythonIf())
                 args.append(arg.getName())
             else:
                 args.append(arg)

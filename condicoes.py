@@ -7,7 +7,6 @@ class Condicoes:
         return self.struct[1]
     def toPython(self,tab=2):
         tabs = '\t'*tab
-        print(self.struct[0])
         cond = ' '.join(self.struct[0])
         then = self.struct[1].toPython(tab+1)
         corpoelse = self.struct[2].toPython(tab+1)
