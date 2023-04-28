@@ -10,6 +10,15 @@ import re
 
 exp = re.compile(r'((\+|\-)?\d+(\.\d+)?|True|False)')
 
+def transforma(lista):
+    index = 0
+    for e in lista:
+        if isinstance(e,ListVar) or isinstance(e,ListStatic):
+            lista[index] = e.toPythonRes()
+        elif isinstance(e,list):
+            lista[index] = ''.join(e)
+        index +=1
+    return lista
 
 # Python produção de código
 # produção nova sinais (muito simular a varoper)
@@ -117,9 +126,10 @@ def p_Args(p):
 
 def p_Conjunto(p):
     'Conjunto : Conjunto VIR Result'
-    if (not isinstance(p[3], list)):
-        p[3] = [p[3]]
-    p[0] = p[1] + [p[2]] + p[3]
+    if (isinstance(p[3], list)):
+        p[3] = transforma(p[3])
+        p[3] = ''.join(p[3])
+    p[0] = p[1] + [p[2],p[3]]
     if len(p) == 5:
         p[0] += p[4]
     return p
@@ -127,7 +137,10 @@ def p_Conjunto(p):
 
 def p_Conjunto_Result(p):
     'Conjunto : Result'
-    p[0] = p[1]
+    if isinstance(p[1],list):
+        p[1] = transforma(p[1])
+        p[1] = ''.join(p[1])
+    p[0] = [p[1]]
     return p
 
 
@@ -218,7 +231,7 @@ def p_Result(p):
         p[0] = p[1] + [p[2]] + [p[3]] + [p[4]] + [p[5]]
     elif (len(p) == 4):
         if (p[2] in ['+', '-', '*', '/', '$', 'and', 'or', '<', '>', '=', '!=', '>=', '<=', 'in']):
-            p[0] = p[1] + [p[2]] + [p[3]]
+            p[0] = p[1] + [p[2]] + p[3]
         elif (isinstance(p[2], list)):
             p[0] = p[1] + str(p[2]) + p[3]
         else:
@@ -230,7 +243,7 @@ def p_Result(p):
             p[0] = p[1] + p[2]
     else:
         p[0] = p[1]
-    print(p[0])
+    # print(p[0])
     return p
 
 
@@ -349,6 +362,7 @@ def p_Chamadafun_NoArgs(p):
 
 def p_Chamadafun(p):
     'Chamadafun : WORD ABREP Conjunto FECHAP'
+    print(p[3])
     for e in range(0, len(p[3]), 2):
         p[3][e] = getImut(p[3][e])
     p[0] = [p[1], p[2]] + p[3] + [p[4]]
@@ -580,7 +594,7 @@ deff con3([[h1:2:h2:3:t]:t2],k)
         else
             return False;
     else 
-        return seila(kkk(1,2,3));
+        return seila(1,3*1*(-40)+43,2,kkk(1,2,3));
 end
 
 """
