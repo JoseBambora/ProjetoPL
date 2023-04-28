@@ -1,4 +1,4 @@
-from resultado import Resultado
+import resultado
 import re
 
 def getArgs(numtabs,self):
@@ -49,7 +49,7 @@ class ListVar:
         return res
 
     def toPythonRes(self):
-        aux = list(map(lambda l: Resultado(None, l, None).toPython(0)[7:], self.l))
+        aux = list(map(lambda l: resultado.Resultado(None, l, None).toPython(0)[7:], self.l))
         res = aux[:-1]
         cab = ','.join(res)
         return f'[{cab}] + {aux[-1]}'
@@ -74,7 +74,7 @@ class ListStatic:
         return '\n'.join(res)
 
     def toPythonRes(self):
-        aux = list(map(lambda l: Resultado(None, l, None).toPython(0)[7:], self.l))
+        aux = list(map(lambda l: resultado.Resultado(None, l, None).toPython(0)[7:], self.l))
         content = ','.join(aux)
         return f'[{content}]'
     

@@ -1,5 +1,6 @@
 import re
 from imutable import getImut
+import liststructs as ls
 
 class Resultado:
 
@@ -11,8 +12,10 @@ class Resultado:
         for item in self.struct[1]:
             if isinstance(item, list):
                 flattened.extend(Resultado(None, item, None).toPython(0)[7:])
+            elif isinstance(item, ls.ListVar) or isinstance(item,ls.ListStatic):
+                flattened.append(item.toPythonRes())
             else:
-                flattened.append(str(item))
+                flattened.append(item)
         res = ""
         # print("FLATTENED: "+str(flattened)) tirar de comentário para debug
         for elem in flattened:

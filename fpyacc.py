@@ -4,10 +4,8 @@ from lexer import tokens
 from base import Base
 from condicoes import Condicoes
 from resultado import Resultado
-from liststructs import ListVar
-from liststructs import ListStatic
-from imutable import getImut
-from imutable import getNameList
+from liststructs import ListVar,ListStatic
+from imutable import getImut,getNameList
 import re
 
 exp = re.compile(r'((\+|\-)?\d+(\.\d+)?|True|False)')
@@ -232,7 +230,7 @@ def p_Result(p):
             p[0] = p[1] + p[2]
     else:
         p[0] = p[1]
-    # print(p[0])
+    print(p[0])
     return p
 
 
@@ -577,12 +575,12 @@ end
 
 deff con3([[h1:2:h2:3:t]:t2],k)
     if ((k in t) and (k in t2))
-        if (k != 2)
+        if (k != seila(2,3,4))
             return con2([[2:3:t]:t2],k,3);
         else
             return False;
     else 
-        return False;
+        return seila(kkk(1,2,3));
 end
 
 """
@@ -593,4 +591,4 @@ end
 parser = yacc.yacc(debug=True)
 # parser.listasnomes = {}
 parser.nomeslistas = 0
-parser.parse(inp)
+parser.parse(inp3)

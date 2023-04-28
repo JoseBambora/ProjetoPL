@@ -1,5 +1,4 @@
-from liststructs import ListStatic
-from liststructs import ListVar
+from liststructs import ListStatic,ListVar
 
 class Base:
     def __init__(self, variaveis):
