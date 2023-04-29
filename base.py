@@ -1,4 +1,5 @@
-from liststructs import ListStatic,ListVar
+from liststructs import ListStatic, ListVar
+
 
 class Base:
     def __init__(self, variaveis):
@@ -16,4 +17,3 @@ class Base:
             else:
                 args.append(arg)
         return ', '.join(args)
-

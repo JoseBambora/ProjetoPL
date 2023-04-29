@@ -1,25 +1,28 @@
 import ply.yacc as yacc
+import re
 from lexer import lexer
 from lexer import tokens
 from base import Base
 from condicoes import Condicoes
 from resultado import Resultado
-from liststructs import ListVar,ListStatic
-from imutable import getImut,getNameList
-import re
+from liststructs import ListVar, ListStatic
+from imutable import getImut, getNameList
+from funcao import Funcao
 
 exp = re.compile(r'((\+|\-)?\d+(\.\d+)?|True|False)')
+
 
 def transforma(lista):
     index = 0
     for e in lista:
-        if isinstance(e,ListVar) or isinstance(e,ListStatic):
+        if isinstance(e, ListVar) or isinstance(e, ListStatic):
             lista[index] = e.toPythonRes()
-        elif isinstance(e,list):
+        elif isinstance(e, list):
             e = transforma(e)
             lista[index] = ''.join(e)
-        index +=1
+        index += 1
     return lista
+
 
 # Python produção de código
 # produção nova sinais (muito simular a varoper)
@@ -92,7 +95,32 @@ def p_Fpython(p):
 
 def trata_funcao(p):
     # p.parser.listasnomes = {}
-    p.parser.nomeslistas = 0
+    nome = p[2]
+    b = False
+    index = 0
+    lista = p.parser.funcoes
+    print('!!!!!!!!!!!!!!!!!!')
+    print(lista)
+    print('!!!!!!!!!!!!!!!!!!')
+
+    if len(p) == 8:
+        fun = Funcao(p[2], p[4], p[6]).nova_funcao()
+    else:
+        fun = Funcao(p[2], [], p[6]).nova_funcao()
+
+    for i in lista:
+        if nome in i:
+            b = True
+            break
+        index += 1
+    if b:
+        lista[index]["implementação"].append(fun)
+        # adicionar dentro do dicionário da funcao: nova implementação
+    else:
+        lista.append(fun)
+        # Adicionar novo dicionário à lista com a nova função
+
+    return p
 
 
 def p_Funcao_Args(p):
@@ -114,10 +142,12 @@ def p_Funcao(p):
     trata_funcao(p)
     return p
 
+
 def p_Args_Var(p):
     'Args : VarArgs'
     p[0] = [p[1]]
     return p
+
 
 def p_Args(p):
     'Args : Args VIR VarArgs'
@@ -125,12 +155,13 @@ def p_Args(p):
     p[0] += [p[3]]
     return p
 
+
 def p_Conjunto(p):
     'Conjunto : Conjunto VIR Result'
     if (isinstance(p[3], list)):
         p[3] = transforma(p[3])
         p[3] = ''.join(p[3])
-    p[0] = p[1] + [p[2],p[3]]
+    p[0] = p[1] + [p[2], p[3]]
     if len(p) == 5:
         p[0] += p[4]
     return p
@@ -138,7 +169,7 @@ def p_Conjunto(p):
 
 def p_Conjunto_Result(p):
     'Conjunto : Result'
-    if isinstance(p[1],list):
+    if isinstance(p[1], list):
         p[1] = transforma(p[1])
         p[1] = ''.join(p[1])
     p[0] = [p[1]]
@@ -176,11 +207,13 @@ def p_Cond_CONDOR(p):
     p[0] = p[1] + ['or'] + p[3]
     return p
 
+
 def p_Cond_NOT(p):
     'Cond : NOT CondSimple'
     p[2].insert(0, p[1])
     p[0] = p[2]
     return p
+
 
 def p_CondSimple_ABREP(p):
     'CondSimple : ABREP Cond FECHAP'
@@ -224,10 +257,11 @@ def p_Result_OpernVareper(p):
     'Result : Opern Varoper'
     if (isinstance(p[2], list)):
         p[2] = transforma(p[2])
-        p[0] = [p[1]+''.join(p[2])]
+        p[0] = [p[1] + ''.join(p[2])]
     else:
         p[0] = p[1] + p[2]
     return p
+
 
 def p_Result_OpernRes(p):
     'Result : Opern ABREP Result FECHAP'
@@ -237,6 +271,7 @@ def p_Result_OpernRes(p):
     else:
         p[0] = p[1] + p[2] + p[3] + p[4]
     return p
+
 
 # 3*1*([h:t])+43
 def p_Result(p):
@@ -259,7 +294,7 @@ def p_Result(p):
     elif (len(p) == 3):
         if (isinstance(p[2], list)):
             p[2] = transforma(p[2])
-            p[0] = [p[1]+''.join(p[2])]
+            p[0] = [p[1] + ''.join(p[2])]
         else:
             p[0] = p[1] + p[2]
     else:
@@ -337,7 +372,7 @@ def p_List_Vazia(p):
     name = getNameList(p.parser.nomeslistas)
     lista = ListStatic([], name)
     p[0] = lista
-    p.parser.nomeslistas +=1
+    p.parser.nomeslistas += 1
     # p.parser.listasnomes[name] = lista
     return p
 
@@ -347,7 +382,7 @@ def p_List_Estatica(p):
     name = getNameList(p.parser.nomeslistas)
     lista = ListStatic(p[2], name)
     p[0] = lista
-    p.parser.nomeslistas +=1
+    p.parser.nomeslistas += 1
     # p.parser.listasnomes[name] = lista
     return p
 
@@ -357,7 +392,7 @@ def p_List(p):
     name = getNameList(p.parser.nomeslistas)
     lista = ListVar(p[2], p[4], name)
     p[0] = lista
-    p.parser.nomeslistas +=1
+    p.parser.nomeslistas += 1
     # p.parser.listasnomes[name] = lista
     return p
 
@@ -393,10 +428,12 @@ def p_error(p):
     print('Erro ' + str(p))
     return p
 
+
 def p_VarArgs_BOOL(p):
     'VarArgs : BOOL'
     p[0] = p[1].capitalize()
     return p
+
 
 def p_VarArgs(p):
     '''
@@ -405,11 +442,12 @@ def p_VarArgs(p):
             | ListArg
             | WORD
     '''
-    if(len(p) == 2):
+    if (len(p) == 2):
         p[0] = p[1]
     else:
-        p[0] = [p[1],p[2]]
+        p[0] = [p[1], p[2]]
     return p
+
 
 def p_ListArg(p):
     '''
@@ -419,9 +457,9 @@ def p_ListArg(p):
     '''
     name = getNameList(p.parser.nomeslistas)
     if len(p) == 3:
-        lista = ListStatic([],name)
+        lista = ListStatic([], name)
     elif len(p) == 4:
-        lista = ListStatic(p[2],name)
+        lista = ListStatic(p[2], name)
     else:
         lista = ListVar(p[2], p[4], name)
     p[0] = lista
@@ -429,11 +467,12 @@ def p_ListArg(p):
     # p.parser.listasnomes[name] = lista
     return p
 
+
 def p_ConjuntoListaArgs_Single(p):
     'ConjuntoListaArgs : VarArgs'
     p[0] = [p[1]]
     return p
-    
+
 
 def p_ConjuntoListaArgs(p):
     'ConjuntoListaArgs : ConjuntoListaArgs VIR VarArgs'
@@ -445,12 +484,13 @@ def p_Conjunto2ListaArgs_Single(p):
     'Conjunto2ListaArgs : VarArgs'
     p[0] = [p[1]]
     return p
-    
+
 
 def p_Conjunto2ListaArgs(p):
     'Conjunto2ListaArgs : Conjunto2ListaArgs NEXT VarArgs'
     p[0] = p[1] + [p[3]]
     return p
+
 
 inp2 = '''
 """FPYTHON 
@@ -613,4 +653,5 @@ end
 parser = yacc.yacc(debug=True)
 # parser.listasnomes = {}
 parser.nomeslistas = 0
+parser.funcoes = []
 parser.parse(inp3)
