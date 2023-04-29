@@ -99,9 +99,6 @@ def trata_funcao(p):
     b = False
     index = 0
     lista = p.parser.funcoes
-    print('!!!!!!!!!!!!!!!!!!')
-    print(lista)
-    print('!!!!!!!!!!!!!!!!!!')
 
     if len(p) == 8:
         fun = Funcao(p[2], p[4], p[6]).nova_funcao()
@@ -109,16 +106,21 @@ def trata_funcao(p):
         fun = Funcao(p[2], [], p[6]).nova_funcao()
 
     for i in lista:
-        if nome in i:
+        if nome in i.values():
             b = True
             break
         index += 1
     if b:
-        lista[index]["implementação"].append(fun)
+        nova_implementacao = fun["implementação"]
+        lista[index]["implementação"].extend(nova_implementacao)
         # adicionar dentro do dicionário da funcao: nova implementação
     else:
         lista.append(fun)
         # Adicionar novo dicionário à lista com a nova função
+
+    print('!!!!!!!!!!!!!!!!!!')
+    print(lista)
+    print('!!!!!!!!!!!!!!!!!!')
 
     return p
 
