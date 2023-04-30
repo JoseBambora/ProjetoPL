@@ -1,5 +1,5 @@
 import re
-from imutable import getImut
+from auxfunctions import getImut
 import liststructs as ls
 
 class Resultado:
@@ -25,3 +25,5 @@ class Resultado:
             res = res + elem
         t = '\t' * numtabs
         return t + 'return ' + getImut(res)
+    def __str__(self):
+        return self.toPython()

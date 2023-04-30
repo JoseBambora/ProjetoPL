@@ -6,7 +6,7 @@ class Condicoes:
         return self.struct[1]
 
     def getElse(self):
-        return self.struct[1]
+        return self.struct[2]
 
     def toPython(self, tab=2):
         tabs = '\t' * tab

@@ -6,11 +6,9 @@ from base import Base
 from condicoes import Condicoes
 from resultado import Resultado
 from liststructs import ListVar, ListStatic
-from imutable import getImut, getNameList
+from auxfunctions import getImut, getNameList, chamadaFuncoes
 from funcao import Funcao
-
-exp = re.compile(r'((\+|\-)?\d+(\.\d+)?|True|False)')
-
+from topython import toPython
 
 def transforma(lista):
     index = 0
@@ -23,11 +21,6 @@ def transforma(lista):
         index += 1
     return lista
 
-
-# Python produção de código
-# produção nova sinais (muito simular a varoper)
-# argumentos (+|-) NUMBER
-
 def p_Codigo(p):
     '''Codigo : Codigo Python
               | Codigo CodigoFun
@@ -35,75 +28,38 @@ def p_Codigo(p):
               | CodigoFun'''
     return p
 
-
 def p_CodigoFun(p):
     'CodigoFun : ABREFP Fpython FECHAFP'
     return p
-
 
 def p_Python(p):
     '''
     Python : REST
     '''
-    # if p[1] != None:
-    #     print(f'Código Python {p[1]}')
-    # else:
-    #     print(f'Código Python {p[2]}')
+    if(p[1].__contains__('import')):
+        p.parser.importspython.append(p[1])
+    else:
+        p.parser.codigopython.append(p[1])
     return p
 
-
-# deff uminho([h:t:t2:t3]):
-#       return 0;
-# end
-
-# def uminho(l):
-#   h = l[0]
-#   t = l[1]
-#   t2 = l[2]
-#   t3 = l[3:]
-#   return 0
-#
-
-# h:t
-# cabeca = lista[0]
-# cauda = lista[1:]
-# h:h2:t
-# cabeca = lista[0]
-# cabeca2 = lista[1]
-# cauda = lista[2:]
 def p_Fpython(p):
     '''
     Fpython : Fpython Funcao
             | Funcao
     '''
-    # funcao = p[2]
-    # p.yacc.funcoes = []
-    # b = False
-    # i = 0
-    # for f in p.yacc.funcoes:
-    #     if f['nome'] == funcao['nome']:
-    #         b = True
-    #         break
-    #     i+=1
-    # if not b:
-    #     p.yacc.funcoes.append(funcao)
-    # else:
-    #     dec = p.yacc.funcoes[i]
-    print('=============================')
     return p
 
-
 def trata_funcao(p):
-    # p.parser.listasnomes = {}
-    nome = p[2]
+    p.parser.nomeslistas = 0
+    nome = chamadaFuncoes(p[2])
     b = False
     index = 0
     lista = p.parser.funcoes
 
     if len(p) == 8:
-        fun = Funcao(p[2], p[4], p[6]).nova_funcao()
+        fun = Funcao(nome, p[4], p[6]).nova_funcao()
     else:
-        fun = Funcao(p[2], [], p[6]).nova_funcao()
+        fun = Funcao(nome, [], p[6]).nova_funcao()
 
     for i in lista:
         if nome in i.values():
@@ -118,9 +74,9 @@ def trata_funcao(p):
         lista.append(fun)
         # Adicionar novo dicionário à lista com a nova função
 
-    print('!!!!!!!!!!!!!!!!!!')
-    print(lista)
-    print('!!!!!!!!!!!!!!!!!!')
+    # print('!!!!!!!!!!!!!!!!!!')
+    # print(lista)
+    # print('!!!!!!!!!!!!!!!!!!')
 
     return p
 
@@ -130,7 +86,7 @@ def p_Funcao_Args(p):
     print(f'def {p[2]}({Base(p[4]).toPythonBase()}):')
     print(f'Meter ifs para pattern matching')
     print(f'Invocar função toPythonArgs das listas caso temos listas')
-    print(f'Função resultado:\n{p[6].toPython()}')  # meter toPython
+    print(f'Função resultado:\n{p[6].toPython()}')
     trata_funcao(p)
     return p
 
@@ -140,7 +96,7 @@ def p_Funcao(p):
     print(f'def {p[2]}():')
     print(f'Meter ifs para pattern matching')
     print(f'Invocar função toPythonArgs das listas caso temos listas')
-    print(f'Função resultado:\n{p[5].toPython()}')  # meter toPython
+    print(f'Função resultado:\n{p[5].toPython()}')
     trata_funcao(p)
     return p
 
@@ -250,7 +206,6 @@ def p_Conds(p):
           | MENORIGUAL
           | IN
     '''
-    # print(f'Condicao operador {p[1]}')
     p[0] = p[1]
     return p
 
@@ -274,8 +229,6 @@ def p_Result_OpernRes(p):
         p[0] = p[1] + p[2] + p[3] + p[4]
     return p
 
-
-# 3*1*([h:t])+43
 def p_Result(p):
     '''
     Result : Varoper
@@ -309,7 +262,6 @@ def p_Opern(p):
     Opern : ADD
           | MINUS
     '''
-    # print(p[1])
     p[0] = p[1]
     return p
 
@@ -324,7 +276,6 @@ def p_Oper(p):
          | AND
          | Conds
     '''
-    # print(f'Operacao {p[1]}')
     p[0] = p[1]
     return p
 
@@ -343,50 +294,39 @@ def p_Varoper(p):
 
 def p_Var_NUMBER(p):
     'Var : NUMBER'
-    # print(f'Número {p[1]}')
     p[0] = p[1]
     return p
 
 
 def p_Var_BOOL(p):
     'Var : BOOL'
-    # print(f'Booleano: {p[1]}')
     p[0] = p[1].capitalize()
     return p
 
-
 def p_Var_List(p):
     'Var : List'
-    # print(f'Lista')
     p[0] = p[1]
     return p
-
 
 def p_VAR_WORD(p):
     'Var : WORD'
-    # print(f'Variável: {p[1]}')
     p[0] = p[1]
     return p
 
+def criaListaStatic(p,l):
+    name = getNameList(p.parser.nomeslistas)
+    lista = ListStatic(l, name)
+    p[0] = lista
+    p.parser.nomeslistas += 1
+    return p
 
 def p_List_Vazia(p):
     'List : ABREL FECHAL'
-    name = getNameList(p.parser.nomeslistas)
-    lista = ListStatic([], name)
-    p[0] = lista
-    p.parser.nomeslistas += 1
-    # p.parser.listasnomes[name] = lista
-    return p
-
+    return criaListaStatic(p,[])
 
 def p_List_Estatica(p):
     'List : ABREL Conjunto FECHAL'
-    name = getNameList(p.parser.nomeslistas)
-    lista = ListStatic(p[2], name)
-    p[0] = lista
-    p.parser.nomeslistas += 1
-    # p.parser.listasnomes[name] = lista
-    return p
+    return criaListaStatic(p,p[2])
 
 
 def p_List(p):
@@ -395,7 +335,6 @@ def p_List(p):
     lista = ListVar(p[2], p[4], name)
     p[0] = lista
     p.parser.nomeslistas += 1
-    # p.parser.listasnomes[name] = lista
     return p
 
 
@@ -413,7 +352,7 @@ def p_Conjunto2(p):
 
 def p_Chamadafun_NoArgs(p):
     'Chamadafun : WORD ABREP FECHAP'
-    p[0] = [p[1], p[2], p[3]]
+    p[0] = [chamadaFuncoes(p[1]), p[2], p[3]]
     return p
 
 
@@ -422,7 +361,7 @@ def p_Chamadafun(p):
     print(p[3])
     for e in range(0, len(p[3]), 2):
         p[3][e] = getImut(p[3][e])
-    p[0] = [p[1], p[2]] + p[3] + [p[4]]
+    p[0] = [chamadaFuncoes(p[1]), p[2]] + p[3] + [p[4]]
     return p
 
 
@@ -466,7 +405,6 @@ def p_ListArg(p):
         lista = ListVar(p[2], p[4], name)
     p[0] = lista
     p.parser.nomeslistas += 1
-    # p.parser.listasnomes[name] = lista
     return p
 
 
@@ -523,6 +461,10 @@ end
 '''
 
 inp = '''
+import ply.yacc as yacc
+import ply.lex
+from lexer import tokens
+
 print('Boas')
 """FPYTHON
 deff mais_um(x)
@@ -600,7 +542,7 @@ deff seila([h:t],num,false)
 end
 
 deff seila3(d)
-    return seila4(5+(3*d)); 
+    return seila3(5+(3*d)); 
 end
 """
 
@@ -613,7 +555,7 @@ print(sum_l)
 
 """FPYTHON
 
-deff uminho()
+deff uminho(1,2)
     return 1+2;
 end
 
@@ -636,6 +578,9 @@ deff con2([[2:t]:t2],k)
    return 0;
 end
 
+deff con3([[3]],k)
+    return 0;
+end
 
 deff con3([[h1:2:h2:3:t]:t2],k)
     if ((k in t) and (k in t2))
@@ -649,11 +594,14 @@ end
 
 """
 '''
-# deff con2([[h:t]:t2],k)
-#    return 0;
-# end
+
 parser = yacc.yacc(debug=True)
-# parser.listasnomes = {}
 parser.nomeslistas = 0
 parser.funcoes = []
-parser.parse(inp3)
+parser.codigopython = []
+parser.importspython = []
+parser.parse(inp)
+toPython(parser)
+# codigopython
+# importspython
+# mudar estrutura (relativamente ao argumentos)

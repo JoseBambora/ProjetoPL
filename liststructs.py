@@ -80,7 +80,7 @@ class ListStatic:
     
     def toPythonIf(self):
         res = []
-        res.append(f'len({self.letter}) == {len(self.l)-1}')
+        res.append(f'len({self.letter}) == {len(self.l)}')
         res.extend(getIf(self))
         return ' and '.join(res)
 
