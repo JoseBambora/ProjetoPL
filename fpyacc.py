@@ -553,6 +553,11 @@ l = [1,2,3,4,5]
 sum_l = f_sum_(l)
 print(sum_l)
 
+def seila():
+    print('boas')
+    i = 3 + 5
+    print(i)
+
 """FPYTHON
 
 deff uminho(1,2)

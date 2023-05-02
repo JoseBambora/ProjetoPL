@@ -44,8 +44,8 @@ tokens = (
 
 states = (('FPYTHON', 'inclusive'),)
 
-t_ignore = ' \t\n'
-
+t_FPYTHON_ignore = ' \t\n'
+t_ignore = '\n'
 
 def t_FPYTHON_VIR(t):
     r','
