@@ -569,6 +569,33 @@ deff uminho(n,t)
 end
 """
 
+
+"""FPYTHON
+
+deff con2([1,2,3,4,false],k)
+    return 0;
+end
+
+deff con2([[2:t]:t2],k)
+   return 0;
+end
+
+deff con3([[3]],k)
+    return 0;
+end
+
+deff con3([[[h1:k]:[h2:k2]:3:t]:t2],k)
+    if ((k in t) and (k in t2))
+        if (k != seila(2,3,4))
+            return con2([[2:3:t]:t2],k,3);
+        else
+            return False;
+    else 
+        return seila(3*(-(1)),1,3*1*(-(40*50*len([h1:t])))+43-([h:t]),2,kkk(1,2,3));
+end
+
+"""
+
 print(f_uminho_())
 '''
 

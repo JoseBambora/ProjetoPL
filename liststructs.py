@@ -3,26 +3,29 @@ import re
 
 def getArgs(numtabs,self):
     res = []
+    aux = []
     t = numtabs * '\t'
     for e in range(0, len(self.l) - 1):
         elem = self.l[e]
         if not isinstance(elem,str):
             if isinstance(elem,ListVar) or isinstance(elem,ListStatic):
                 res.append(f'{t}{elem.letter} = {self.letter}[{e}]')
-                res.append(elem.toPythonArgs())
+                aux.append(elem.toPythonArgs())
         elif not exp.match(elem):
-            res.append(f'{t}{elem} = {self.letter}[{e}]')    
+            res.append(f'{t}{elem} = {self.letter}[{e}]')  
+    res.extend(aux)  
     return res
 
-def getIf(self):
+def getIf(self,aux):
     res = []
     index = 0
     for elem in self.l:
         if not isinstance(elem,str):
             if isinstance(elem,ListVar) or isinstance(elem,ListStatic):
-                res.append(f'({elem.toPythonIf()})')
+                subcond = elem.toPythonIf(f'{aux}[{index}]')
+                res.append(f'({subcond})')
         elif exp.match(elem):
-            res.append(f'{self.letter}[{index}] == {elem}')
+            res.append(f'{aux}[{index}] == {elem}')
         index +=1 
     return res
 
@@ -33,10 +36,12 @@ class ListVar:
         self.l = [elem] + list(filter(lambda s: s != ':', rest))
         self.letter = letter
 
-    def toPythonIf(self):
+    def toPythonIf(self,aux=''):
+        if(aux == ''):
+            aux = self.letter
         res = []
-        res.append(f'len({self.letter}) >= {len(self.l)-1}')
-        res.extend(getIf(self))
+        res.append(f'len({aux}) >= {len(self.l)-1}')
+        res.extend(getIf(self,aux))
         return ' and '.join(res)
 
     def toPythonArgs(self, numtabs=2):
@@ -78,10 +83,12 @@ class ListStatic:
         content = ','.join(aux)
         return f'[{content}]'
     
-    def toPythonIf(self):
+    def toPythonIf(self,aux=''):
+        if(aux == ''):
+            aux = self.letter
         res = []
-        res.append(f'len({self.letter}) == {len(self.l)}')
-        res.extend(getIf(self))
+        res.append(f'len({aux}) == {len(self.l)}')
+        res.extend(getIf(self,aux))
         return ' and '.join(res)
 
     def getName(self):
