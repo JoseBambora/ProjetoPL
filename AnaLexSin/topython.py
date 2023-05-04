@@ -1,6 +1,7 @@
 
 from AnaLexSin.AuxFiles.liststructs import ListVar, ListStatic
 import re
+import numpy as np
 exp = re.compile(r'((\+|\-)?\d+(\.\d+)?|True|False)')
 
 # Argumentos (Argumento => string)
@@ -99,8 +100,9 @@ def reorganiza_fun(codigofun):
         if not haselse:
             resto.append('\telse:\n\t\tValueError')
     else:
-        resto = list(map(lambda a: a[1:],codigofun[1:])) 
-        resto = list(map(lambda a: re.sub('\t\t','\t',a),resto))
+        for e in codigofun[1:]:
+            resto.extend(e.split('\n'))
+        resto = list(map(lambda a: re.sub(r'^\t\t','\t',a),resto))
         resto.insert(0,codigofun[0])
     return resto + elseCorpo
 
@@ -123,8 +125,6 @@ def toPythonFun(fun):
             codigoFun.append(codigo)
         resultado = str(i['res'])
         codigoFun.append(resultado)
-    # argumentosfinal = ','.join(argumentos)
-    # codigoFun[0] += f'({argumentosfinal}):'
     return reorganiza_fun(codigoFun)
 
 def toPython(parser,namefileres):
