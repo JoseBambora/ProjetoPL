@@ -4,7 +4,21 @@ from ply.lex import lex
 # Falar de word não começar com números
 # Exemplos
 
-tokens = (
+reserved = {
+   'if' : 'IF',
+   'else' : 'ELSE',
+   'in' : 'IN',
+   'not' : 'NOT',
+   'deff' : 'FUNABRE',
+   'end' : 'FUNFECHA',
+   'return' : 'RETURN',
+   'and' : 'CONDAND',
+   'or' : 'CONDOR',
+   'true' : 'BOOL',
+   'false' : 'BOOL'
+}
+
+tokens = [
     'ADD',  # +
     'MINUS',  # -
     'TIMES',  # *
@@ -13,15 +27,15 @@ tokens = (
     'OR',  # |
     'AND',  # &
     'NUMBER',  # INT FLOAT
-    'BOOL',  # true false
-    'FUNABRE',  # deff
-    'FUNFECHA',  # end
+    # 'BOOL',  # true false
+    # 'FUNABRE',  # deff
+    # 'FUNFECHA',  # end
     'ABREP',  # (
     'FECHAP',  # )
     'VIR',  # , -> argumentos
     'WORD',  # palavra
-    'IF',  # if
-    'ELSE',  # else
+    # 'IF',  # if
+    # 'ELSE',  # else
     'ABREFP',  # """FPYTHON
     'FECHAFP',  # """
     'MENOR',  # <
@@ -30,17 +44,17 @@ tokens = (
     'DIFERENTE',  # !=
     'MAIORIGUAL',  # >=
     'MENORIGUAL',  # <=
-    'IN',  # in
-    'NOT',  # not
-    'CONDAND',  # and
-    'CONDOR',  # or
-    'RETURN',  # return
+    # 'IN',  # in
+    # 'NOT',  # not
+    # 'CONDAND',  # and
+    # 'CONDOR',  # or
+    # 'RETURN',  # return
     'ABREL',  # [
     'FECHAL',  # ]
     'NEXT',  # :
     'PV',  # ;
     'REST'
-)
+] + list(set(reserved.values()))
 
 states = (('FPYTHON', 'inclusive'),)
 
@@ -112,18 +126,6 @@ def t_FPYTHON_FECHAFP(t):
     return t
 
 
-def t_FPYTHON_FUNABRE(t):
-    r'deff'
-    # print('----------------Abre função----------------------')
-    return t
-
-
-def t_FPYTHON_BOOL(t):
-    r'(true|false)'
-    # print(f'Booleano {t.value}',end=' ')
-    return t
-
-
 def t_FPYTHON_ABREL(t):
     r'\['
     # print('[',end=' ')
@@ -148,23 +150,16 @@ def t_FPYTHON_FECHAP(t):
     return t
 
 
-def t_FPYTHON_FUNFECHA(t):
-    r'end'
-    # print('--------------Termina função---------------------')
+def t_FPYTHON_MENORIGUAL(t):
+    r'<='
+    # print('<=',end=' ')
     return t
 
 
-def t_FPYTHON_IF(t):
-    r'if'
-    # print('if')
+def t_FPYTHON_MAIORIGUAL(t):
+    r'>='
+    # print('>=',end=' ')
     return t
-
-
-def t_FPYTHON_ELSE(t):
-    r'else'
-    # print('else')
-    return t
-
 
 def t_FPYTHON_MENOR(t):
     r'<'
@@ -177,58 +172,15 @@ def t_FPYTHON_MAIOR(t):
     # print('>',end=' ')
     return t
 
-
-def t_FPYTHON_MENORIGUAL(t):
-    r'<='
-    # print('<=',end=' ')
-    return t
-
-
-def t_FPYTHON_MAIORIGUAL(t):
-    r'>='
-    # print('>=',end=' ')
-    return t
-
-
 def t_FPYTHON_IGUAL(t):
     r'=='
     # print('==',end=' ')
     return t
 
 
-def t_FPYTHON_IN(t):
-    r'in'
-    # print('in',end=' ')
-    return t
-
-
-def t_FPYTHON_NOT(t):
-    r'not'
-    # print('not',end=' ')
-    return t
-
-
 def t_FPYTHON_DIFERENTE(t):
     r'!='
     # print('!=',end=' ')
-    return t
-
-
-def t_FPYTHON_CONDAND(t):
-    r'and'
-    # print('and',end=' ')
-    return t
-
-
-def t_FPYTHON_CONDOR(t):
-    r'or'
-    # print('or',end=' ')
-    return t
-
-
-def t_FPYTHON_RETURN(t):
-    r'return'
-    # print('Return' ,end=' ')
     return t
 
 
@@ -258,6 +210,7 @@ def t_FPYTHON_NUMBER(t):
 def t_FPYTHON_WORD(t):
     r'[A-Za-z_]\w*'
     # print(f'Palavra {t.value}',end=' ')
+    t.type = reserved.get(t.value,'WORD')
     return t
 
 

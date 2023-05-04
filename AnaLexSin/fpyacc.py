@@ -183,10 +183,7 @@ def p_CondSimple_ABREP(p):
 
 def p_CondSimple(p):
     '''
-    CondSimple : ABREP Cond FECHAP Conds Varoper
-               | Varoper Conds ABREP Cond FECHAP
-               | ABREP Cond FECHAP Conds ABREP Cond FECHAP
-               | Varoper Conds Varoper
+    CondSimple : CondSimple Oper Varoper
                | Varoper
     '''
     if (len(p) > 2):
@@ -430,7 +427,7 @@ def p_Conjunto2ListaArgs(p):
     p[0] = p[1] + [p[3]]
     return p
 
-parser = yacc.yacc()
+parser = yacc.yacc(debug=True)
 parser.nomeslistas = 0
 parser.funcoes = []
 parser.codigopython = []

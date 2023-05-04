@@ -21,14 +21,14 @@ def get_args_ifs_codigo(implementacao):
     argumentos = implementacao['args']
     if(len(argumentos) == 0):
         args = []
-        codigo = ''
-        ifs = ''
+        codigo = []
+        ifs = []
     else:
         argsaux = list(map(lambda a: takeout_lists_args(a),argumentos))
         args = list(map(lambda a: a[0],argsaux))
-        codigo = list(map(lambda a: a[1],argsaux))[0]
-        ifs = list(map(lambda a: a[2],argsaux))[0]
-    return (args,ifs,codigo)
+        codigo = list(filter(lambda s: s != '',map(lambda a: a[1],argsaux)))
+        ifs = list(filter(lambda s: s != '', map(lambda a: a[2],argsaux)))
+    return (args,' and '.join(ifs),'\n'.join(codigo))
 
 # Associação de variaveis + pattern matching
 # Associação de variaveis e pattern matching para números e bools 
@@ -72,7 +72,7 @@ def gera_if(implementacoes, ifsargs, ifs,aux):
     else:
         res = ''
     for a in aux.keys():
-        res = re.sub(a,aux[a],res)
+        res = re.sub(f'\({a}\)',f'({aux[a]})',res)
     return res
 
 # Passar o else para última posição
@@ -82,8 +82,10 @@ def reorganiza_fun(codigofun):
     b = False
     haveIfs = re.match(r'(\tif|\telse)',codigofun[1])
     if haveIfs:
+        haselse = False
         for s in codigofun:
             if '\telse:' == s:
+                haselse = True
                 b = True
                 elseCorpo.append(s)
             elif b:
@@ -94,6 +96,8 @@ def reorganiza_fun(codigofun):
                     elseCorpo.append(s)
             else:
                 resto.append(s)
+        if not haselse:
+            resto.append('\telse:\n\t\tValueError')
     else:
         resto = list(map(lambda a: a[1:],codigofun[1:])) 
         resto = list(map(lambda a: re.sub('\t\t','\t',a),resto))
