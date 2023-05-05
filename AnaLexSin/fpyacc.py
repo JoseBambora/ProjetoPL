@@ -142,56 +142,46 @@ def p_Corpofun_RETURN(p):
 
 
 def p_Corpofun_IF(p):
-    'Corpofun : IF ABREP Cond FECHAP Corpofun ELSE Corpofun'
+    'Corpofun : IF ABREP CondInside FECHAP Corpofun ELSE Corpofun'
     # print(f'Funcao {p[1]} {p[2]} {p[3]} {p[4]} {p[6]}')
     p[0] = Condicoes(p[3], p[5], p[7])
     return p
 
+def p_CondInside_CONDNOT(p):
+    'CondInside : NOT AuxCondInside'
+    p[0] = [p[1]] + p[2]
+    return p
 
-def p_Cond_CondSimple(p):
-    'Cond : CondSimple'
+
+def p_CondInside_CONDAND(p):
+    'CondInside : CondInside CONDAND AuxCondInside'
+    p[0] =  p[1] + ['and'] + p[3]
+    return p
+
+def p_CondInside_CONDAND_Result(p):
+    'CondInside : CondInside CONDAND Result'
+    p[0] =  p[1] + ['and'] + p[3]
+    return p
+
+def p_CondInside_CONDOR(p):
+    'CondInside : CondInside CONDOR AuxCondInside'
+    p[0] =  p[1] + ['or'] + p[3]
+    return p
+
+def p_CondInside_CONDOR_Result(p):
+    'CondInside : CondInside CONDOR Result'
+    p[0] =  p[1] + ['or'] + p[3]
+    return p
+
+def p_AuxCondInside(p):
+    'AuxCondInside : ABREP CondInside FECHAP'
+    p[0] = [p[1]] + p[2] + [p[3]]
+    return p
+
+def p_CondInside_Result(p):
+    'CondInside : Result'
     p[0] = p[1]
     return p
-
-
-def p_Cond_CONDAND(p):
-    'Cond : Cond CONDAND CondSimple'
-    p[0] = p[1] + ['and'] + p[3]
-    return p
-
-
-def p_Cond_CONDOR(p):
-    'Cond : Cond CONDOR CondSimple'
-    p[0] = p[1] + ['or'] + p[3]
-    return p
-
-
-def p_Cond_NOT(p):
-    'Cond : NOT CondSimple'
-    p[2].insert(0, p[1])
-    p[0] = p[2]
-    return p
-
-
-def p_CondSimple_ABREP(p):
-    'CondSimple : ABREP Cond FECHAP'
-    p[2].insert(0, p[1])
-    p[2].append(p[3])
-    p[0] = p[2]
-    return p
-
-
-def p_CondSimple(p):
-    '''
-    CondSimple : CondSimple Oper Varoper
-               | Varoper
-    '''
-    if (len(p) > 2):
-        p[0] = p[1] + [p[2]] + p[3]
-    else:
-        p[0] = p[1]
-    return p
-
 
 def p_Conds(p):
     '''
@@ -207,8 +197,8 @@ def p_Conds(p):
     return p
 
 
-def p_Result_OpernVareper(p):
-    'Result : Opern Varoper'
+def p_Sinais_OpernVareper(p):
+    'Sinais : Opern Varoper'
     if (isinstance(p[2], list)):
         p[2] = transforma(p[2])
         p[0] = [p[1] + ''.join(p[2])]
@@ -217,7 +207,7 @@ def p_Result_OpernVareper(p):
     return p
 
 
-def p_Result_OpernRes(p):
+def p_Sinais_OpernRes(p):
     'Result : Opern ABREP Result FECHAP'
     if (isinstance(p[3], list)):
         p[3] = transforma(p[3])
@@ -230,13 +220,14 @@ def p_Result(p):
     '''
     Result : Varoper
            | Result Oper Varoper
-           | ABREP Result FECHAP
+           | Result Oper Sinais
            | Result Oper ABREP Result FECHAP
+           | Sinais
     '''
     if (len(p) == 6):
         p[0] = p[1] + [p[2]] + [p[3]] + [p[4]] + [p[5]]
     elif (len(p) == 4):
-        if (p[2] in ['+', '-', '*', '/', '$', 'and', 'or', '<', '>', '=', '!=', '>=', '<=', 'in']):
+        if (p[2] in ['+', '-', '*', '/', '<', '>', '!=', '>=', '<=', 'in','==','%']):
             p[0] = p[1] + [p[2]] + p[3]
         elif (isinstance(p[2], list)):
             p[2] = transforma(p[2])
