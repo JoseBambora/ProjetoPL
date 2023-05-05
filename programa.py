@@ -33,8 +33,7 @@ def execCode(codeFile):
         print(codeFile)
         with open(codeFile, "r") as f:
             code = f.read()
-            #print(code)
-            exec(code,globals())
+            exec(code,globals()) #para correr o código temos de usar aqui globals() para mutar o global namespace para o namespace do código gerado
     print("Fim de execução")
 
 
