@@ -1,7 +1,6 @@
 from AnaLexSin.fpyacc import parser
 from AnaLexSin.topython import toPython
 
-
 def havepy(namefile):
     if not namefile.__contains__('.py'):
         namefile += '.py'
@@ -26,7 +25,20 @@ def escreveRes():
     print('A escrever ficheiro resultante')
     toPython(parser,namefile)
     print(f'Escreveu ficheiro {namefile}')
+    return namefile
+
+def execCode(codeFile):
+    toExec = input("Pressione a tecla S se desejar correr o código gerado.\n")
+    if toExec.lower() == "s":
+        print(codeFile)
+        with open(codeFile, "r") as f:
+            code = f.read()
+            #print(code)
+            exec(code,globals())
+    print("Fim de execução")
+
 
 namefile,lines = getLinesfile()
 parseficheiro(namefile,lines)
-escreveRes()
+codeFile=escreveRes()
+execCode(codeFile)
