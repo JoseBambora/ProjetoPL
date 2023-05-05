@@ -20,7 +20,7 @@ deff append([h:t],num)
 end
 
 deff adiciona(l,num)
-    if (not pertence(l,num))
+    if (not (pertence(l,num)))
         return append(l,num);
     else
         return l;

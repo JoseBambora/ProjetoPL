@@ -30,3 +30,34 @@ print(y)
 l = [1,2,3,4,5]
 sum_l = f_sum_(l)
 print(sum_l)
+
+"""FPYTHON
+deff complicado(x,y,z)
+    if (not (x < z and x > y))
+        return 0;
+    else
+        if (x == z or x == y)
+            return 1;
+        else
+            if(z == y and (not (z < z) and z != 1))
+                return 2;
+            else
+                if(z <= y or z <= x)
+                    return 3;
+                else
+                    return 4;
+end
+
+deff complicado(0,y,z)
+    if (y == z)
+        return 0;
+    else
+        if (y < z)
+            return 1;
+        else
+            if (y+z < -1)
+                return 2;
+            else
+                return 3;
+end
+"""
