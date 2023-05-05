@@ -73,7 +73,7 @@ def gera_if(implementacoes, ifsargs, ifs,aux):
     else:
         res = ''
     for a in aux.keys():
-        res = re.sub(f'\({a}\)',f'({aux[a]})',res)
+        res = re.sub(f'\({a}',f'({aux[a]}',res)
     return res
 
 # Passar o else para última posição

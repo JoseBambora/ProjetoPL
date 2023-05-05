@@ -77,7 +77,28 @@ end
 deff complicado2([h:t],[h2:t2])
     return h == h2 and complicado2(t,t2);
 end
+
+deff getindexAux([h],_)
+    return h;
+end
+
+deff getindexAux([h:t],index)
+    if(index == 0)
+        return h;
+    else
+        return getindexAux(t,index-1);
+end
+        
+deff getindex([],_)
+    return [];
+end
+
+deff getindex([[h:t2]:t],index)
+    return [getindexAux([h:t2],index):getindex(t,index)];
+end
 """
 
 print(f_complicado2_([1,2,3],[1,2,3]))
 print(f_complicado2_([1,2,3],[1,2,3,4]))
+
+print(f_getindex_([[1,2],[3,4],[5,6,7,4]],3))

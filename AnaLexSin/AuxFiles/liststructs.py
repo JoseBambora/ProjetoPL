@@ -1,11 +1,14 @@
 import AnaLexSin.AuxFiles.resultado as resultado
 import re
 
-def getArgs(numtabs,self):
+def getArgs(numtabs,self,bool):
     res = []
     aux = []
     t = numtabs * '\t'
-    for e in range(0, len(self.l) - 1):
+    lim = len(self.l)
+    if bool:
+        lim -= 1
+    for e in range(0, lim):
         elem = self.l[e]
         if not isinstance(elem,str):
             if isinstance(elem,ListVar) or isinstance(elem,ListStatic):
@@ -46,7 +49,7 @@ class ListVar:
 
     def toPythonArgs(self, numtabs=2):
         t = '\t' * numtabs
-        res = getArgs(numtabs,self)
+        res = getArgs(numtabs,self,True)
         res.append(f'{t}{self.l[-1]} = {self.letter}[{len(self.l)-1}:]')
         # res = Base(res).toPythonBase()
         # res.reverse()
@@ -75,7 +78,7 @@ class ListStatic:
         self.letter = letter
 
     def toPythonArgs(self, numtabs=2):
-        res = getArgs(numtabs,self)
+        res = getArgs(numtabs,self,False)
         return '\n'.join(res)
 
     def toPythonRes(self):
