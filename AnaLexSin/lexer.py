@@ -58,8 +58,11 @@ tokens = [
 
 states = (('FPYTHON', 'inclusive'),)
 
-t_FPYTHON_ignore = ' \t\n'
-t_ignore = '\n'
+t_FPYTHON_ignore = ' \t'
+
+def t_newline(t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
 
 def t_FPYTHON_VIR(t):
     r','
