@@ -60,4 +60,24 @@ deff complicado(0,y,z)
             else
                 return 3;
 end
+
+
+deff complicado2([],[])
+    return true;
+end
+
+deff complicado2(_,[])
+    return false;
+end
+
+deff complicado2([],_)
+    return false;
+end
+
+deff complicado2([h:t],[h2:t2])
+    return h == h2 and complicado2(t,t2);
+end
 """
+
+print(f_complicado2_([1,2,3],[1,2,3]))
+print(f_complicado2_([1,2,3],[1,2,3,4]))
