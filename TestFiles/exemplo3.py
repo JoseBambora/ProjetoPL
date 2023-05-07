@@ -96,9 +96,30 @@ end
 deff getindex([[h:t2]:t],index)
     return [getindexAux([h:t2],index):getindex(t,index)];
 end
+
+deff abs(x)
+    if (x >= 0)
+        return x;
+    else
+        return x*-1;
+end
+
+deff inverso(True)
+    return False;
+end
+
+deff inverso(False)
+    return True;
+end
 """
 
 print(f_complicado2_([1,2,3],[1,2,3]))
 print(f_complicado2_([1,2,3],[1,2,3,4]))
 
 print(f_getindex_([[1,2],[3,4],[5,6,7,4]],3))
+
+print(f_abs_(-1))
+print(f_abs_(0))
+print(f_abs_(30))
+print(f_inverso_(False))
+print(f_inverso_(True))

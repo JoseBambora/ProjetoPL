@@ -56,7 +56,7 @@ deff qsort([])
 end
 
 deff qsort([h:t])
-    return junta(qsort(menores(h,t)),qsort(maiores(h,t)),h);
+    return junta({qsort menores}(h,t),{qsort maiores}(h,t),h);
 end
 """
 
