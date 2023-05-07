@@ -53,7 +53,9 @@ tokens = [
     'FECHAL',  # ]
     'NEXT',  # :
     'PV',  # ;
-    'REST'
+    'REST',
+    'ABREC',
+    'FECHAC'
 ] + list(set(reserved.values()))
 
 states = (('FPYTHON', 'inclusive'),)
@@ -69,6 +71,13 @@ def t_FPYTHON_VIR(t):
     # print(',',end=' ')
     return t
 
+def t_FPYTHON_ABREC(t):
+    r'\{'
+    return t
+
+def t_FPYTHON_FECHAC(t):
+    r'\}'
+    return t
 
 def t_FPYTHON_ADD(t):
     r'\+'

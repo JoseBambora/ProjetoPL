@@ -360,18 +360,44 @@ def p_Conjunto2(p):
     p[0] = p[1] + [p[2], p[3]]
     return p
 
+def aux_gera_chamada_fun(funcoes,argumentos):
+    funabrp = list(map(lambda nomefun: getImut(nomefun+'(')[:-1],funcoes[1:]))
+    funabrp.insert(0,funcoes[0]+'(')
+    funres = ''.join(funabrp)
+    fechap = len(funcoes) * ')' * 2
+    return f'{funres}{argumentos}{fechap[:-1]}'
 
 def p_Chamadafun_NoArgs(p):
-    'Chamadafun : WORD ABREP FECHAP'
-    p[0] = [chamadaFuncoes(p[1]), p[2], p[3]]
+    'Chamadafun : ChamadaFunName ABREP FECHAP'
+    p[0] = aux_gera_chamada_fun(p[1],'')
     return p
 
-
 def p_Chamadafun(p):
-    'Chamadafun : WORD ABREP Conjunto FECHAP'
+    'Chamadafun : ChamadaFunName ABREP Conjunto FECHAP'
     for e in range(0, len(p[3]), 2):
         p[3][e] = getImut(p[3][e])
-    p[0] = [chamadaFuncoes(p[1]), p[2]] + p[3] + [p[4]]
+    p[3] = ''.join(p[3])
+    p[0] = aux_gera_chamada_fun(p[1],p[3])
+    return p
+
+def p_ChamadaFunName_Single(p):
+    'ChamadaFunName : WORD'
+    p[0] = [chamadaFuncoes(p[1])]
+    return p
+
+def p_ChamadaFunName_Composicao(p):
+    'ChamadaFunName : ABREC Composicao FECHAC'
+    p[0] = p[2]
+    return p
+
+def p_Composicao_Single(p):
+    'Composicao : WORD'
+    p[0] = [chamadaFuncoes(p[1])]
+    return p
+
+def p_Composicao(p):
+    'Composicao : Composicao WORD'
+    p[0] =  p[1] + [chamadaFuncoes(p[2])]
     return p
 
 
