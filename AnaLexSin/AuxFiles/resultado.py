@@ -24,6 +24,6 @@ class Resultado:
                 elem = '-' + m.group(1)
             res = res + elem
         t = '\t' * numtabs
-        return t + 'return ' + getImut(res)
+        return t + 'return ' + res
     def __str__(self):
         return self.toPython()

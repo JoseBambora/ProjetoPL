@@ -10,7 +10,7 @@ class Condicoes:
 
     def toPython(self, tab=2):
         tabs = '\t' * tab
-        cond = ' '.join(self.struct[0])
+        cond = ''.join(self.struct[0])
         then = self.struct[1].toPython(tab + 1)
         corpoelse = self.struct[2].toPython(tab + 1)
         return f'{tabs}if {cond}:\n{then}\n{tabs}else:\n{corpoelse}'

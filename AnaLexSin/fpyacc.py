@@ -6,7 +6,7 @@ from AnaLexSin.AuxFiles.base import Base
 from AnaLexSin.AuxFiles.condicoes import Condicoes
 from AnaLexSin.AuxFiles.resultado import Resultado
 from AnaLexSin.AuxFiles.liststructs import ListVar, ListStatic
-from AnaLexSin.AuxFiles.auxfunctions import getImut, getNameList, chamadaFuncoes
+from AnaLexSin.AuxFiles.auxfunctions import getNameList, chamadaFuncoes
 from AnaLexSin.AuxFiles.funcao import Funcao
 from AnaLexSin.topython import toPython
 
@@ -149,7 +149,7 @@ def p_Corpofun_IF(p):
 
 def p_CondInside_CONDNOT(p):
     'CondInside : NOT CondNOT'
-    p[0] = [p[1]] + p[2]
+    p[0] = [f'{p[1]} '] + p[2]
     return p
 
 def p_CondInside_CD_AuxCondInside(p):
@@ -250,7 +250,7 @@ def p_Result(p):
     if (len(p) == 6):
         p[0] = p[1] + [p[2]] + [p[3]] + [p[4]] + [p[5]]
     elif (len(p) == 4):
-        if (p[2] in ['+', '-', '*', '/', '<', '>', '!=', '>=', '<=', 'in','==','%']):
+        if (p[2].replace(' ','') in ['+', '-', '*', '/', '<', '>', '!=', '>=', '<=', 'in','==','%']):
             p[0] = p[1] + [p[2]] + p[3]
         elif (isinstance(p[2], list)):
             p[2] = transforma(p[2])
@@ -287,7 +287,7 @@ def p_Oper(p):
          | AND
          | Conds
     '''
-    p[0] = p[1]
+    p[0] = f' {p[1]} '
     return p
 
 
@@ -361,11 +361,10 @@ def p_Conjunto2(p):
     return p
 
 def aux_gera_chamada_fun(funcoes,argumentos):
-    funabrp = list(map(lambda nomefun: getImut(nomefun+'(')[:-1],funcoes[1:]))
-    funabrp.insert(0,funcoes[0]+'(')
+    funabrp = list(map(lambda nomefun: nomefun+'(',funcoes))
     funres = ''.join(funabrp)
-    fechap = len(funcoes) * ')' * 2
-    return f'{funres}{argumentos}{fechap[:-1]}'
+    fechap = len(funcoes) * ')'
+    return f'{funres}{argumentos}{fechap}'
 
 def p_Chamadafun_NoArgs(p):
     'Chamadafun : ChamadaFunName ABREP FECHAP'
@@ -374,8 +373,6 @@ def p_Chamadafun_NoArgs(p):
 
 def p_Chamadafun(p):
     'Chamadafun : ChamadaFunName ABREP Conjunto FECHAP'
-    for e in range(0, len(p[3]), 2):
-        p[3][e] = getImut(p[3][e])
     p[3] = ''.join(p[3])
     p[0] = aux_gera_chamada_fun(p[1],p[3])
     return p

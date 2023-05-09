@@ -2,6 +2,7 @@
 from AnaLexSin.AuxFiles.liststructs import ListVar, ListStatic
 import re
 import numpy as np
+from AnaLexSin.AuxFiles.auxfunctions import getImut
 exp = re.compile(r'((\+|\-)?\d+(\.\d+)?|True|False)')
 
 # Argumentos: nomes dos argumentos
@@ -61,7 +62,8 @@ def associacao_vars_elem(arg,word):
         if isinstance(arg,list):
             arg = ''.join(arg)
         if not exp.match(arg):
-            res = f'\t\t{arg} = {word}'
+            aux = getImut(word)
+            res = f'\t\t{arg} = {aux}'
         else:
             res = ''
     return res

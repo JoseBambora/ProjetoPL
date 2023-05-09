@@ -1,7 +1,8 @@
 import AnaLexSin.AuxFiles.resultado as resultado
 import re
+from AnaLexSin.AuxFiles.auxfunctions import getImut
 
-def getArgs(numtabs,self,bool):
+def getArgs(numtabs,self,bool,elemento):
     res = []
     aux = []
     t = numtabs * '\t'
@@ -10,12 +11,13 @@ def getArgs(numtabs,self,bool):
         lim -= 1
     for e in range(0, lim):
         elem = self.l[e]
+        indice = f'{elemento}[{e}]'
+        imut = getImut(indice)
         if not isinstance(elem,str):
             if isinstance(elem,ListVar) or isinstance(elem,ListStatic):
-                res.append(f'{t}{elem.letter} = {self.letter}[{e}]')
-                aux.append(elem.toPythonArgs())
+                aux.append(elem.toPythonArgs(elemento=indice))
         elif not exp.match(elem):
-            res.append(f'{t}{elem} = {self.letter}[{e}]')  
+            res.append(f'{t}{elem} = {imut}')  
     res.extend(aux)  
     return res
 
@@ -47,10 +49,13 @@ class ListVar:
         res.extend(getIf(self,aux))
         return ' and '.join(res)
 
-    def toPythonArgs(self, numtabs=2):
+    def toPythonArgs(self, numtabs=2, elemento=''):
+        if len(elemento) == 0:
+            elemento = self.letter
         t = '\t' * numtabs
-        res = getArgs(numtabs,self,True)
-        res.append(f'{t}{self.l[-1]} = {self.letter}[{len(self.l)-1}:]')
+        res = getArgs(numtabs,self,True,elemento)
+        aux = getImut(f'{elemento}[{len(self.l)-1}:]')
+        res.append(f'{t}{self.l[-1]} = {aux}')
         # res = Base(res).toPythonBase()
         # res.reverse()
         res = '\n'.join(res)
@@ -77,8 +82,10 @@ class ListStatic:
         self.l = list(filter(lambda s: s != ',', elems))
         self.letter = letter
 
-    def toPythonArgs(self, numtabs=2):
-        res = getArgs(numtabs,self,False)
+    def toPythonArgs(self, numtabs=2,elemento=''):
+        if len(elemento) == 0:
+            elemento = self.letter
+        res = getArgs(numtabs,self,False,elemento)
         return '\n'.join(res)
 
     def toPythonRes(self):
