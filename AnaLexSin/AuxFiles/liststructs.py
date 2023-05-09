@@ -16,7 +16,7 @@ def getArgs(numtabs,self,bool,elemento):
         if not isinstance(elem,str):
             if isinstance(elem,ListVar) or isinstance(elem,ListStatic):
                 aux.append(elem.toPythonArgs(elemento=indice))
-        elif not exp.match(elem):
+        elif not exp.match(elem) and elem != '_':
             res.append(f'{t}{elem} = {imut}')  
     res.extend(aux)  
     return res

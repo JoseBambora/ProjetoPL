@@ -111,6 +111,18 @@ end
 deff inverso(False)
     return True;
 end
+
+deff all_zero([0])
+    return true;
+end
+
+deff all_zero([0:t])
+    return all_zero(t);
+end
+
+deff all_zero(_)
+    return false;
+end
 """
 
 print(f_complicado2_([1,2,3],[1,2,3]))
@@ -123,3 +135,7 @@ print(f_abs_(0))
 print(f_abs_(30))
 print(f_inverso_(False))
 print(f_inverso_(True))
+
+print(f_all_zero_([0,0,0,0,0]))
+print(f_all_zero_([0,0,0,3,0]))
+print(f_all_zero_([1,0,0,-3,0]))

@@ -61,7 +61,7 @@ def associacao_vars_elem(arg,word):
     else:
         if isinstance(arg,list):
             arg = ''.join(arg)
-        if not exp.match(arg):
+        if not exp.match(arg) and arg != '_':
             aux = getImut(word)
             res = f'\t\t{arg} = {aux}'
         else:
