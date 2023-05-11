@@ -76,12 +76,15 @@ def aux_pm_av(argumentos,args,funcao):
             res.append(resaux)
     return res
 
-def pattern_matching(argumentos,args):
+def pattern_matching(argumentos,args,fst):
     condicoes = aux_pm_av(argumentos,args,pattern_matching_elem)
     strfinal = ''
     if(len(condicoes) > 0):
         strfinal = ' and '.join(condicoes)
-        strfinal = f'\tif {strfinal}:'
+        ifstr = 'elif'
+        if fst:
+            ifstr = 'if'
+        strfinal = f'\t{ifstr} {strfinal}:'
     return strfinal
 
 def associacao_vars(argumentos,args):
@@ -101,12 +104,14 @@ def toPythonFun(fun):
     argumentos = geraArgs(implementacoes[0]['args'])
     aux = ','.join(argumentos)
     codigoFun = [f'def {name}({aux}):']
+    fst = True
     for i in implementacoes:
-        pm = pattern_matching(argumentos,i['args'])
+        pm = pattern_matching(argumentos,i['args'],fst)
         av = associacao_vars(argumentos,i['args'])
         gc = gera_codigo(i['res'])
         if len(pm) > 0:
             codigoFun.append(pm)
+            fst = False
         elif len(implementacoes) > 1:
             codigoFun.append('\telse:')
         if len(av) > 0:
