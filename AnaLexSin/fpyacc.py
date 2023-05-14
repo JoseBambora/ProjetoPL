@@ -48,6 +48,8 @@ def p_Fpython(p):
     return p
 
 def trata_funcao(p):
+    p.parser.variaveisfun = []
+    p.parser.errosvar = set()
     p.parser.nomeslistas = 0
     nome = chamadaFuncoes(p[2])
     b = False
@@ -327,6 +329,9 @@ def p_Var_List(p):
 
 def p_VAR_WORD(p):
     'Var : WORD'
+    if (not p[1] in p.parser.variaveisfun) and (not p[1] in p.parser.errosvar):
+        p.parser.errors.append(f'Variavel {p[1]} na linha {lexer.lineno}, não está definida')
+        p.parser.errosvar.add(p[1])
     p[0] = p[1]
     return p
 
@@ -416,13 +421,17 @@ def p_VarArgs_BOOL(p):
     p[0] = p[1].capitalize()
     return p
 
+def p_VarArgs_WORD(p):
+    'VarArgs : WORD'
+    p.parser.variaveisfun.append(p[1])
+    p[0] = p[1]
+    return p
 
 def p_VarArgs(p):
     '''
     VarArgs : NUMBER
             | Opern NUMBER
             | ListArg
-            | WORD
     '''
     if (len(p) == 2):
         p[0] = p[1]
@@ -485,3 +494,6 @@ parser.funcoes = []
 parser.codigopython = []
 parser.importspython = []
 parser.warnings = []
+parser.variaveisfun = []
+parser.errosvar = set()
+parser.errors = []

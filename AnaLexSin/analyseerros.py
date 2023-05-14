@@ -77,4 +77,5 @@ def analyse(parser):
         if len(e1[0]) > 0:
             errors.extend(e1)
         errors.extend(e2)
+    errors.extend(parser.errors)
     return errors

@@ -3,11 +3,12 @@
 deff len([]) return 0; end
 deff len([h:t]) return 1 + len(t); end
 
-deff kkk(_,_,_) return False; end
+deff kkk(_,_,_) return false; end
 
 deff con2(h,k)
-    return seila(t) + seila(t2) + seila(t3);
+    return seila(h) + seila(h) + seila(k);
 end
+
 
 deff con2([h:t:t2:t3:t4],n)
     if (n == h)
@@ -17,7 +18,7 @@ deff con2([h:t:t2:t3:t4],n)
             else
                 return [h,t,t2];
         else
-            return false;
+            return funcaonaodefinda(1,2,3);
     else 
         if (con2(t,n))
             if(true)
@@ -159,7 +160,7 @@ deff con3([[[h1:k]:[h2:k2]:3:t]:t2],k)
         if (k != seila(2,3,4))
             return con2([[2:3:t]:t2],k,3);
         else
-            return False;
+            return false;
     else 
         return seila(3*(-(1)),1,3*1*(-(40*50*len([h1:t])))+43-([h1:t]),2,kkk(1,2,3));
 end
@@ -200,7 +201,7 @@ deff con3([[h1:2:h2:3:t]:t2],k)
         if (k != seila(2,3,4))
             return con2([[2:3:t]:t2],k,3);
         else
-            return False;
+            return false;
     else 
         return seila(3*(-(1)),1,3*1*(-(40*50*len([h1:t])))+43-([h2:t]),2,kkk(1,2,3));
 end

@@ -104,12 +104,12 @@ deff abs(x)
         return x*-1;
 end
 
-deff inverso(True)
-    return False;
+deff inverso(true)
+    return false;
 end
 
-deff inverso(False)
-    return True;
+deff inverso(false)
+    return true;
 end
 
 deff all_zero([0])
