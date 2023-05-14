@@ -1,9 +1,5 @@
 from ply.lex import lex
 
-# Falar dos tokens: # : ; then
-# Falar de word não começar com números
-# Exemplos
-
 reserved = {
    'if' : 'IF',
    'else' : 'ELSE',
@@ -227,152 +223,15 @@ def t_FPYTHON_WORD(t):
 
 
 def t_INITIAL_REST(t):
-    r'(?:(?!""").)+'
+    # r'(?:(?!""").)+'
+    r'.+'
     return t
 
 
 def t_error(t):
+    t.lexer.errors(f'Token "{t.value}" não está definido')
     t.lexer.skip(1)
-    return t
 
 
 lexer = lex()
-lexer.stack = []
-
-inp2 = '''
-"""FPYTHON
-deff pertence([],_)
-    return false;
-end
-
-deff pertence([h:t],num)
-    if (h == num) 
-        return true ;
-    else 
-        return pertence(t,num) ;
-end
-
-deff append([],num)
-    return [num];
-end
-
-deff append([h:t],num)
-    return [h:append(t,num)];
-end
-
-deff adiciona(l,num)
-    if (not pertence(l,num))
-        return append(l,num) ;
-    else
-        return l ;
-end
-
-deff eliminarepetidos([])
-    return [];
-end
-deff eliminarepetidos([h:t])
-    return adiciona(eliminarepetidos(t),h);
-end
-"""
-
-lista = [1,2,3,4,5,6,3,4,51,243,13,53,32]
-soma = f_eliminarepetidos_(lista)
-# print(soma)
-'''
-
-inp = '''
-
-"""FPYTHON
-deff mais_um(x)
-    return x + 1;
-end
-
-deff sum([])
-    return 0;
-end
-
-deff div(n,0)
-    return 0;
-end
-
-deff div(0,n)
-    return 0;
-end
-
-deff div(n,-1)
-    return n*(-1);
-end
-
-deff sum([h : t])
-    return h + sum(t);
-end
-
-deff cond(x)
-    if (x < 1)
-        return 2;
-    else
-        return 3;
-end
-
-deff con2([],_)
-    return false;
-end
-
-deff con2([h:t],n)
-    if (n == h)
-        if (not con2(t,n))
-            if(true)
-                return true;
-            else
-                return false;
-        else
-            return false;
-    else 
-        if (con2(t,n))
-            if(true)
-                return true;
-            else
-                return false;
-        else
-            return false;
-end
-
-deff seila([1,2],0,true)
-    return 4;
-end
-
-deff seila([],num,true)
-    return num+1;
-end
-
-deff seila([],num,false)
-    return num;
-end
-
-deff seila([h:t],num,true)
-    return h + seila(t) + num + 1;
-end
-
-deff seila([h:t],num,false)
-    return h + seila3(seila(t)) + num;
-end
-
-deff seila3(d)
-    return seila4(5+(3*d)); 
-end
-"""
-
-x = 4
-y = f_mais_um_(x)
-# print(y)
-l = [1,2,3,4,5]
-sum_l = f_sum_(l)
-# print(sum_l)
-'''
-
-lexer.input(inp2)
-t = lexer.token()
-while (t):
-    # if t.type != 'error':
-    #     print(t)
-    t = lexer.token()
+lexer.errors = []

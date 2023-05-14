@@ -1,5 +1,4 @@
 import ply.yacc as yacc
-import re
 from AnaLexSin.lexer import lexer
 from AnaLexSin.lexer import tokens
 from AnaLexSin.AuxFiles.base import Base
@@ -8,7 +7,6 @@ from AnaLexSin.AuxFiles.resultado import Resultado
 from AnaLexSin.AuxFiles.liststructs import ListVar, ListStatic
 from AnaLexSin.AuxFiles.auxfunctions import getNameList, chamadaFuncoes
 from AnaLexSin.AuxFiles.funcao import Funcao
-from AnaLexSin.topython import toPython
 
 def transforma(lista):
     index = 0
@@ -154,11 +152,19 @@ def p_CondInside_CONDNOT(p):
 
 def p_CondInside_CD_AuxCondInside(p):
     'CondInside : CondInside ConjDisj AuxCondInside'
+    if isinstance(p[1],str):
+        p[1] = [p[1]]
+    if isinstance(p[3],str):
+        p[3] = [p[3]]
     p[0] =  p[1] + p[2] + p[3]
     return p
 
 def p_CondInside_CD_Result(p):
     'CondInside : CondInside ConjDisj Result'
+    if isinstance(p[1],str):
+        p[1] = [p[1]]
+    if isinstance(p[3],str):
+        p[3] = [p[3]]
     p[0] =  p[1] + p[2] + p[3]
     return p
 
@@ -250,11 +256,11 @@ def p_Result(p):
     if (len(p) == 6):
         p[0] = p[1] + [p[2]] + [p[3]] + [p[4]] + [p[5]]
     elif (len(p) == 4):
-        if (p[2].replace(' ','') in ['+', '-', '*', '/', '<', '>', '!=', '>=', '<=', 'in','==','%']):
-            p[0] = p[1] + [p[2]] + p[3]
-        elif (isinstance(p[2], list)):
+        if (isinstance(p[2], list)):
             p[2] = transforma(p[2])
             p[0] = p[1] + ''.join(p[2]) + p[3]
+        elif (p[2].replace(' ','') in ['+', '-', '*', '/', '<', '>', '!=', '>=', '<=', 'in','==','%']):
+            p[0] = p[1] + [p[2]] + p[3]
         else:
             p[0] = p[1] + p[2] + p[3]
     elif (len(p) == 3):
@@ -377,8 +383,14 @@ def p_Chamadafun(p):
     p[0] = aux_gera_chamada_fun(p[1],p[3])
     return p
 
+def funexiste(nome,p):
+    nomes = list(map(lambda fun : fun['nome'],p.parser.funcoes))
+    if not nome in nomes:
+        p.parser.warnings.append(f'Função {nome} não foi definida até à linha {lexer.lineno}')
+
 def p_ChamadaFunName_Single(p):
     'ChamadaFunName : WORD'
+    funexiste(chamadaFuncoes(p[1]),p)
     p[0] = [chamadaFuncoes(p[1])]
     return p
 
@@ -389,19 +401,15 @@ def p_ChamadaFunName_Composicao(p):
 
 def p_Composicao_Single(p):
     'Composicao : WORD'
+    funexiste(chamadaFuncoes(p[1]),p)
     p[0] = [chamadaFuncoes(p[1])]
     return p
 
 def p_Composicao(p):
     'Composicao : Composicao WORD'
+    funexiste(chamadaFuncoes(p[2]),p)
     p[0] =  p[1] + [chamadaFuncoes(p[2])]
     return p
-
-
-def p_error(p):
-    print('Erro ' + str(p))
-    return p
-
 
 def p_VarArgs_BOOL(p):
     'VarArgs : BOOL'
@@ -464,12 +472,16 @@ def p_Conjunto2ListaArgs(p):
     p[0] = p[1] + [p[3]]
     return p
 
-parser = yacc.yacc(debug=True)
+def p_error(p):
+    if p:
+        p.lexer.errors.append(f'O token "{p.value}" de tipo "{p.type}", na linha {p.lineno} não respeita a sintaxe da linguagem')
+    tok = parser.token()
+    parser.errok()
+    return tok
+
+parser = yacc.yacc(debug=True,errorlog=yacc.NullLogger())
 parser.nomeslistas = 0
 parser.funcoes = []
 parser.codigopython = []
 parser.importspython = []
-# toPython(parser)
-# codigopython
-# importspython
-# mudar estrutura (relativamente ao argumentos)
+parser.warnings = []

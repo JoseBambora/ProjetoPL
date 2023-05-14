@@ -136,6 +136,12 @@ print(f_abs_(30))
 print(f_inverso_(False))
 print(f_inverso_(True))
 
-print(f_all_zero_([0,0,0,0,0]))
-print(f_all_zero_([0,0,0,3,0]))
-print(f_all_zero_([1,0,0,-3,0]))
+"""
+"""
+
+def seila():
+    print(f_all_zero_([0,0,0,0,0]))
+    print(f_all_zero_([0,0,0,3,0]))
+    print(f_all_zero_([1,0,0,-3,0])) 
+
+seila()

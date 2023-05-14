@@ -24,7 +24,7 @@ def reorganiza_fun(codigofun):
                 insideelse = True
                 elseCorpo.append(s)
             elif insideelse:
-                if re.match(r'\tif',s):
+                if re.match(r'\t(if|elif)',s):
                     insideelse = False
                     resto.append(s)
                 else:
