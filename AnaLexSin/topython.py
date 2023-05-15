@@ -3,6 +3,7 @@ from AnaLexSin.AuxFiles.liststructs import ListVar, ListStatic
 import re
 import numpy as np
 from AnaLexSin.AuxFiles.auxfunctions import getImut
+from AnaLexSin.funcoes import getFun
 exp = re.compile(r'((\+|\-)?\d+(\.\d+)?|True|False)')
 
 # Argumentos: nomes dos argumentos
@@ -129,6 +130,9 @@ def toPython(parser,namefileres):
         codigoFun = toPythonFun(fun)
         codigoPython.append('\n'.join(codigoFun))
         codigoPython.append('')
+    codigoPython.append('\n#--------------------- Funções pré definidas ---------------------\n')
+    codigoPython.append(getFun('map'))
+    codigoPython.append(getFun('filter'))
     codigoPython.append('\n#-------------------- Fim do Código Funcional --------------------\n')
     codigoPython.extend(parser.codigopython)
     res = '\n'.join(codigoPython)

@@ -7,6 +7,7 @@ from AnaLexSin.AuxFiles.resultado import Resultado
 from AnaLexSin.AuxFiles.liststructs import ListVar, ListStatic
 from AnaLexSin.AuxFiles.auxfunctions import getNameList, chamadaFuncoes
 from AnaLexSin.AuxFiles.funcao import Funcao
+from AnaLexSin.funcoes import getReservadas, getName
 
 def transforma(lista):
     index = 0
@@ -330,8 +331,13 @@ def p_Var_List(p):
 def p_VAR_WORD(p):
     'Var : WORD'
     if (not p[1] in p.parser.variaveisfun) and (not p[1] in p.parser.errosvar):
-        p.parser.errors.append(f'Variavel {p[1]} na linha {lexer.lineno}, não está definida')
-        p.parser.errosvar.add(p[1])
+        nomes = list(map(lambda fun : fun['nome'],p.parser.funcoes))
+        name = chamadaFuncoes(p[1])
+        if name in nomes:
+            p[1] = name
+        else:
+            p.parser.warnings.append(f'Variavel {p[1]} na linha {lexer.lineno}, não está definida')
+            p.parser.errosvar.add(p[1])
     p[0] = p[1]
     return p
 
@@ -395,8 +401,12 @@ def funexiste(nome,p):
 
 def p_ChamadaFunName_Single(p):
     'ChamadaFunName : WORD'
-    funexiste(chamadaFuncoes(p[1]),p)
-    p[0] = [chamadaFuncoes(p[1])]
+    if not p[1] in p.parser.reservadas:
+        p[1] = chamadaFuncoes(p[1])
+        funexiste(p[1],p)
+    else:
+        p[1] = getName(p[1])
+    p[0] = [p[1]]
     return p
 
 def p_ChamadaFunName_Composicao(p):
@@ -406,14 +416,22 @@ def p_ChamadaFunName_Composicao(p):
 
 def p_Composicao_Single(p):
     'Composicao : WORD'
-    funexiste(chamadaFuncoes(p[1]),p)
-    p[0] = [chamadaFuncoes(p[1])]
+    if not p[1] in p.parser.reservadas:
+        p[1] = chamadaFuncoes(p[1])
+        funexiste(p[1],p)
+    else:
+        p[1] = getName(p[1])
+    p[0] = [p[1]]
     return p
 
 def p_Composicao(p):
     'Composicao : Composicao WORD'
-    funexiste(chamadaFuncoes(p[2]),p)
-    p[0] =  p[1] + [chamadaFuncoes(p[2])]
+    if not p[2] in p.parser.reservadas:
+        p[2] = chamadaFuncoes(p[2])
+        funexiste(p[2],p)
+    else:
+        p[2] = getName(p[2])
+    p[0] =  p[1] + [p[2]]
     return p
 
 def p_VarArgs_BOOL(p):
@@ -497,3 +515,4 @@ parser.warnings = []
 parser.variaveisfun = []
 parser.errosvar = set()
 parser.errors = []
+parser.reservadas = getReservadas()
