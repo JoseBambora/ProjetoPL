@@ -14,6 +14,10 @@ end
 
 """FPYTHON
 
+deff map()
+    return false;
+end
+
 deff soma(0,0)
     return 0;
 end

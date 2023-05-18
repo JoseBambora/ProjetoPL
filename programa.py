@@ -55,7 +55,7 @@ def printWarnings():
 namefile,lines = getLinesfile()
 contem_erros = parseficheiro(namefile,lines)
 if(contem_erros):
-    printErrors(lexer.errors,"na sintaxe")
+    printErrors(lexer.errors,"")
 else:
     erros = analyse(parser)
     if len(erros) == 0:

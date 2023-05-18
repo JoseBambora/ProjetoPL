@@ -7,7 +7,7 @@ from AnaLexSin.AuxFiles.resultado import Resultado
 from AnaLexSin.AuxFiles.liststructs import ListVar, ListStatic
 from AnaLexSin.AuxFiles.auxfunctions import getNameList, chamadaFuncoes
 from AnaLexSin.AuxFiles.funcao import Funcao
-from AnaLexSin.funcoes import getReservadas, getName
+from AnaLexSin.funcoes import getReservadas, getName, getPreDefined
 
 def transforma(lista):
     index = 0
@@ -52,28 +52,31 @@ def trata_funcao(p):
     p.parser.variaveisfun = []
     p.parser.errosvar = set()
     p.parser.nomeslistas = 0
-    nome = chamadaFuncoes(p[2])
-    b = False
-    index = 0
-    lista = p.parser.funcoes
-
-    if len(p) == 8:
-        fun = Funcao(nome, p[4], p[6]).nova_funcao()
+    if p[2] in p.parser.predefined:
+        p.lexer.errors.append(f'A função "{p[2]}" é uma função reservada')
     else:
-        fun = Funcao(nome, [], p[5]).nova_funcao()
+        nome = chamadaFuncoes(p[2])
+        b = False
+        index = 0
+        lista = p.parser.funcoes
 
-    for i in lista:
-        if nome in i.values():
-            b = True
-            break
-        index += 1
-    if b:
-        nova_implementacao = fun["implementação"]
-        lista[index]["implementação"].extend(nova_implementacao)
-        # adicionar dentro do dicionário da funcao: nova implementação
-    else:
-        lista.append(fun)
-        # Adicionar novo dicionário à lista com a nova função
+        if len(p) == 8:
+            fun = Funcao(nome, p[4], p[6]).nova_funcao()
+        else:
+            fun = Funcao(nome, [], p[5]).nova_funcao()
+
+        for i in lista:
+            if nome in i.values():
+                b = True
+                break
+            index += 1
+        if b:
+            nova_implementacao = fun["implementação"]
+            lista[index]["implementação"].extend(nova_implementacao)
+            # adicionar dentro do dicionário da funcao: nova implementação
+        else:
+            lista.append(fun)
+            # Adicionar novo dicionário à lista com a nova função
 
     # print('!!!!!!!!!!!!!!!!!!')
     # print(lista)
@@ -516,3 +519,4 @@ parser.variaveisfun = []
 parser.errosvar = set()
 parser.errors = []
 parser.reservadas = getReservadas()
+parser.predefined = getPreDefined()
